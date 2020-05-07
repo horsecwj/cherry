@@ -1,0 +1,19 @@
+---
+# Web --------------------------------------------------------------------------------------
+## currency
+- path: /api/web/currencies
+  method: GET
+
+## grant
+- path: /api/web/grant/create
+  method: POST
+- path: /api/web/grant/confirm
+  method: GET
+- path: /api/web/grant/confirm
+  method: POST
+
+## Wechat user
+- path: /api/web/user/wechat/login
+  method: GET
+- path: /api/web/user/wechat/callback
+  method: GET

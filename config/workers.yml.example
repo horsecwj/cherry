@@ -1,0 +1,59 @@
+---
+- name: SmsWorker
+  exchange: center.default
+  routing_key: center.notification.sms
+  queue: center.notification.sms
+  durable: true
+  threads: 2
+  steps:
+    - 10000
+    - 60000
+
+- name: EmailWorker
+  exchange: center.default
+  routing_key: center.notification.email
+  queue: center.notification.email
+  durable: true
+  threads: 2
+  steps:
+    - 10000
+    - 60000
+
+- name: TransferNotifyWorker
+  exchange: center.default
+  routing_key: center.transfer.notify
+  queue: center.transfer.notify
+  durable: true
+  threads: 4
+  steps:
+    - 500        # 0.5秒
+    - 30000      # 30秒
+    - 60000      # 1分钟
+    - 300000     # 5分钟
+    - 600000     # 10分钟
+    - 1800000    # 30分钟
+    - 7200000    # 2小时
+    - 43200000   # 12小时
+    - 86400000   # 24小时
+    - 172800000  # 48小时
+
+- name: GrantNotifyWorker
+  exchange: center.default
+  routing_key: center.transfer.grant
+  queue: center.transfer.grant
+  durable: true
+  threads: 2
+  steps:
+    - 500       # 0.5秒
+    - 1000      # 1秒
+    - 1000      # 1秒
+
+- name: GrantCancelWorker
+  exchange: center.default
+  routing_key: center.transfer.grant.cancel
+  queue: center.transfer.grant.cancel
+  durable: true
+  threads: 2
+  delays:
+    - 5000       # 5秒
+    - 10000      # 10秒

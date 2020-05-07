@@ -1,0 +1,19 @@
+'zh-CN':
+  withdraw:
+    notice:
+      success: 成功。
+
+'en':
+  withdraw:
+    notice:
+      success: Success.
+
+'ko':
+  withdraw:
+    notice:
+      success: Success.
+
+'ja':
+  withdraw:
+    notice:
+      success: Success.

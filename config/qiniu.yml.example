@@ -1,0 +1,6 @@
+access_key: KLRzTgg0RrKe9Qh2hR9gAhMfe3PqpedORf50de7D
+secret_key: nk-bzSGZZh4qUb5l3KwvBbj1eZdEtwfMEYOiRn1J
+backup_bucket: backup
+csv_bucket: transfer-logs
+csv_host: transfer-logs.58token.cn
+videos_bucket: videos

@@ -1,0 +1,5 @@
+S3_BUCKET_NAME: "assets.lotw.in"
+AWS_ACCESS_KEY_ID: "AKIAJZPN3V7CPE7OHWUQ"
+AWS_SECRET_ACCESS_KEY: "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"
+AWS_REGION: "ap-northeast-2"
+AWS_ASSET_HOST: "https://assets.lotw.in"

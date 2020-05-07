@@ -1,0 +1,901 @@
+{{define "oauth/login"}}
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
+  <style>
+
+    html,body{
+      height: 100%;
+      width: 100%;
+    }
+    *{
+      margin: 0px;
+      padding: 0px;
+    }
+    input:-webkit-autofill {
+      -webkit-box-shadow: 0 0 0px 1000px white inset;
+    }
+    input{
+      border-radius: 4px;
+      border: 1px solid #dcdfe6;
+      outline: none;
+    }
+    #page{
+      min-height: 100%;
+      background-color: #fafafa;
+    }
+    @media screen and (min-width: 1200px){
+      #page .logo_con {
+        width: 1200px;
+      }
+      #page #content {
+        width: 1200px;
+      }
+      #page #continer {
+        width: 420px;
+      }
+    }
+    header{
+      width: 100%;
+      border-bottom: 1px solid #e3e3e3;
+      background-color: #fff;
+    }
+    .logo_con{
+      width: 90%;
+      margin: auto;
+      height: 80px;
+      background-color: #fff;
+      background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAAAkCAYAAACwuGm+AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyhpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTQwIDc5LjE2MDQ1MSwgMjAxNy8wNS8wNi0wMTowODoyMSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTggKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MzA0QjlCRjk2REU1MTFFOEE5QjBCNzg4Nzg3OUMyMEEiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MzA0QjlCRkE2REU1MTFFOEE5QjBCNzg4Nzg3OUMyMEEiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDozMDRCOUJGNzZERTUxMUU4QTlCMEI3ODg3ODc5QzIwQSIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDozMDRCOUJGODZERTUxMUU4QTlCMEI3ODg3ODc5QzIwQSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PpJJiL8AAAbNSURBVHja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);
+      background-repeat: no-repeat;
+      background-position: left center;
+      background-size: 112px;
+    }
+    #content {
+      width: 90%;
+      margin: auto;
+      display: flex;
+      justify-content: center;
+    }
+    #continer {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      height: 400px;
+      background-color: #fff;
+      margin-top: 32px;
+      align-items: center;
+      border-radius: 4px;
+      padding: 0px 40px;
+      width: 70vw;
+      max-width: 420px;
+    }
+    #continer .title{
+      font-weight: bold;
+    }
+    .login_btn{
+      border-radius: 3px;
+      background-color: #007afe;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .input_con{
+      display: flex;
+    }
+    .login_input{
+      width: 100%;
+      padding-left: 8px;
+    }
+    .btn_desc{
+      font-size: 12px;
+    }
+    .btn_desc .mark{
+      color: #0079ff;
+    }
+    .item{
+      width: 100%;
+      text-align: center;
+      height: 48px;
+      line-height: 48px;
+    }
+    .submit_btn{
+      outline: none;
+      border: none;
+      background: none;
+      color: #fff;
+      cursor: pointer;
+      height: 48px;
+    }
+    div#notice{
+      width: 100%;
+      color: red;
+    }
+    #need_geetest{
+      display: none;
+    }
+    #register-wrapper{
+      width:100%;
+      display: flex;
+      justify-content: space-between;
+          
+    }
+    #other-login,#register{
+      cursor:pointer;
+    }
+    #other-login:hover,#register:hover{
+      color: #0079ff;
+    }
+    </style>
+    <style>
+      /* 新增手机号登录 */
+      ::-webkit-scrollbar,
+      ::-webkit-scrollbar-track {
+          background-color: transparent;
+      }
+  
+      ::-webkit-scrollbar {
+          width: 5px;
+          height: 5px;
+      }
+  
+      ::-webkit-scrollbar,
+      ::-webkit-scrollbar-thumb {
+          width: 5px;
+          height: 5px;
+          background-color: rgba(127, 143, 164, 0.4);
+      }
+  
+      ::-webkit-scrollbar-thumb {
+          border-radius: 4px;
+      }
+  
+      dl,
+      dt,
+      dd {
+          margin: 0;
+          padding: 0;
+      }
+  
+      .phone_country li {
+          list-style: none;
+      }
+  
+      .phone_country ul {
+          margin: 0;
+          padding: 0;
+      }
+  
+      #select-phone-container {
+          position: relative;
+          width: 100%;
+      }
+      
+      #select-phone-container.flex {
+        display: flex;
+      }
+
+      #select-phone-container.none {
+        display: none;
+      }
+  
+      .phone_country {
+          width: 100px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          color: #333;
+          margin-right: 6px;
+      }
+  
+      .phone_country.disable {
+          color: #ccc;
+      }
+  
+      #country-countainer {
+          height: 100%;
+      }
+  
+      .country-show {
+          background-color: #fff;
+          border-radius: 3px;
+          cursor: pointer;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: space-around;
+          height: 100%;
+      }
+  
+      .list-open .country-select {
+          z-index: 10;
+          opacity: 1;
+          transform: translateY(0);
+      }
+  
+      .country-select {
+          position: absolute;
+          width: 100%;
+          top: calc(100% + 5px);
+          left: 0;
+          padding-top: 8px;
+          background: #fff;
+          box-shadow: 0 0 1px 0 rgba(8, 31, 64, 0.31),
+              0 4px 8px -2px rgba(8, 31, 64, 0.25);
+          z-index: -1;
+          opacity: 0;
+          transform: translateY(-10px);
+          transition: all 0.3s;
+      }
+  
+      .country-list-container {
+          overflow: auto;
+          max-height: 280px;
+          min-height: 90px;
+      }
+  
+      .coutry-li li {
+          cursor: pointer;
+          height: 40px;
+          line-height: 40px;
+          padding: 0 16px;
+          font-size: 14px;
+          white-space: nowrap;
+          color: #263241;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+      }
+  
+      .coutry-li li.active {
+          background-color: #e8f0fb;
+          color: #357ce1;
+      }
+
+      .coutry-li dt {
+        text-align: left;
+        padding: 0 16px;
+        height: 32px;
+        line-height: 32px;
+        color: #7f8fa4;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .tab-container {
+        width: 100%;
+        font-size: 14px;
+        color: #000;
+        padding-bottom: 8px;
+      }
+      #tab-phone {
+        margin-left: 8px;
+      }
+
+      #tab-phone,#tab-email{
+        cursor: pointer;
+      }
+
+      .tab-container .active{
+        color: #0079ff;
+        border-bottom:2px solid #0079ff;
+        cursor: default;
+      }
+  </style>
+  <script>
+    "v0.4.6 Geetest Inc.";
+
+    (function (window) {
+      "use strict";
+      if (typeof window === 'undefined') {
+        throw new Error('Geetest requires browser environment');
+      }
+
+      var document = window.document;
+      var Math = window.Math;
+      var head = document.getElementsByTagName("head")[0];
+
+      function _Object(obj) {
+        this._obj = obj;
+      }
+
+      _Object.prototype = {
+        _each: function (process) {
+          var _obj = this._obj;
+          for (var k in _obj) {
+            if (_obj.hasOwnProperty(k)) {
+              process(k, _obj[k]);
+            }
+          }
+          return this;
+        }
+      };
+
+      function Config(config) {
+        var self = this;
+        new _Object(config)._each(function (key, value) {
+          self[key] = value;
+        });
+      }
+
+      Config.prototype = {
+        api_server: 'api.geetest.com',
+        protocol: 'http://',
+        typePath: '/gettype.php',
+        fallback_config: {
+          slide: {
+            static_servers: ["static.geetest.com", "dn-staticdown.qbox.me"],
+            type: 'slide',
+            slide: '/static/js/geetest.0.0.0.js'
+          },
+          fullpage: {
+            static_servers: ["static.geetest.com", "dn-staticdown.qbox.me"],
+            type: 'fullpage',
+            fullpage: '/static/js/fullpage.0.0.0.js'
+          }
+        },
+        _get_fallback_config: function () {
+          var self = this;
+          if (isString(self.type)) {
+            return self.fallback_config[self.type];
+          } else if (self.new_captcha) {
+            return self.fallback_config.fullpage;
+          } else {
+            return self.fallback_config.slide;
+          }
+        },
+        _extend: function (obj) {
+          var self = this;
+          new _Object(obj)._each(function (key, value) {
+            self[key] = value;
+          })
+        }
+      };
+      var isNumber = function (value) {
+        return (typeof value === 'number');
+      };
+      var isString = function (value) {
+        return (typeof value === 'string');
+      };
+      var isBoolean = function (value) {
+        return (typeof value === 'boolean');
+      };
+      var isObject = function (value) {
+        return (typeof value === 'object' && value !== null);
+      };
+      var isFunction = function (value) {
+        return (typeof value === 'function');
+      };
+
+      var callbacks = {};
+      var status = {};
+
+      var random = function () {
+        return parseInt(Math.random() * 10000) + (new Date()).valueOf();
+      };
+
+      var loadScript = function (url, cb) {
+        var script = document.createElement("script");
+        script.charset = "UTF-8";
+        script.async = true;
+
+        script.onerror = function () {
+          cb(true);
+        };
+        var loaded = false;
+        script.onload = script.onreadystatechange = function () {
+          if (!loaded &&
+            (!script.readyState ||
+              "loaded" === script.readyState ||
+              "complete" === script.readyState)) {
+
+            loaded = true;
+            setTimeout(function () {
+              cb(false);
+            }, 0);
+          }
+        };
+        script.src = url;
+        head.appendChild(script);
+      };
+
+      var normalizeDomain = function (domain) {
+
+
+        return domain.replace(/^https?:\/\/|\/$/g, '');
+      };
+      var normalizePath = function (path) {
+        path = path.replace(/\/+/g, '/');
+        if (path.indexOf('/') !== 0) {
+          path = '/' + path;
+        }
+        return path;
+      };
+      var normalizeQuery = function (query) {
+        if (!query) {
+          return '';
+        }
+        var q = '?';
+        new _Object(query)._each(function (key, value) {
+          if (isString(value) || isNumber(value) || isBoolean(value)) {
+            q = q + encodeURIComponent(key) + '=' + encodeURIComponent(value) + '&';
+          }
+        });
+        if (q === '?') {
+          q = '';
+        }
+        return q.replace(/&$/, '');
+      };
+      var makeURL = function (protocol, domain, path, query) {
+        domain = normalizeDomain(domain);
+
+        var url = normalizePath(path) + normalizeQuery(query);
+        if (domain) {
+          url = protocol + domain + url;
+        }
+
+        return url;
+      };
+
+      var load = function (protocol, domains, path, query, cb) {
+        var tryRequest = function (at) {
+
+          var url = makeURL(protocol, domains[at], path, query);
+          loadScript(url, function (err) {
+            if (err) {
+              if (at >= domains.length - 1) {
+                cb(true);
+              } else {
+                tryRequest(at + 1);
+              }
+            } else {
+              cb(false);
+            }
+          });
+        };
+        tryRequest(0);
+      };
+
+
+      var jsonp = function (domains, path, config, callback) {
+        if (isObject(config.getLib)) {
+          config._extend(config.getLib);
+          callback(config);
+          return;
+        }
+        if (config.offline) {
+          callback(config._get_fallback_config());
+          return;
+        }
+
+        var cb = "geetest_" + random();
+        window[cb] = function (data) {
+          if (data.status == 'success') {
+            callback(data.data);
+          } else if (!data.status) {
+            callback(data);
+          } else {
+            callback(config._get_fallback_config());
+          }
+          window[cb] = undefined;
+          try {
+            delete window[cb];
+          } catch (e) {}
+        };
+        load(config.protocol, domains, path, {
+          gt: config.gt,
+          callback: cb
+        }, function (err) {
+          if (err) {
+            callback(config._get_fallback_config());
+          }
+        });
+      };
+
+      var throwError = function (errorType, config) {
+        var errors = {
+          networkError: '网络错误',
+          gtTypeError: 'gt字段不是字符串类型'
+        };
+        if (typeof config.onError === 'function') {
+          config.onError(errors[errorType]);
+        } else {
+          throw new Error(errors[errorType]);
+        }
+      };
+
+      var detect = function () {
+        return window.Geetest || document.getElementById("gt_lib");
+      };
+
+      if (detect()) {
+        status.slide = "loaded";
+      }
+
+      window.initGeetest = function (userConfig, callback) {
+
+        var config = new Config(userConfig);
+
+        if (userConfig.https) {
+          config.protocol = 'https://';
+        } else if (!userConfig.protocol) {
+          config.protocol = window.location.protocol + '//';
+        }
+
+
+        if (userConfig.gt === '050cffef4ae57b5d5e529fea9540b0d1' ||
+          userConfig.gt === '3bd38408ae4af923ed36e13819b14d42') {
+          config.apiserver = 'yumchina.geetest.com/';
+          config.api_server = 'yumchina.geetest.com';
+        }
+
+        if (isObject(userConfig.getType)) {
+          config._extend(userConfig.getType);
+        }
+        jsonp([config.api_server || config.apiserver], config.typePath, config, function (newConfig) {
+          var type = newConfig.type;
+          var init = function () {
+            config._extend(newConfig);
+            callback(new window.Geetest(config));
+          };
+
+          callbacks[type] = callbacks[type] || [];
+          var s = status[type] || 'init';
+          if (s === 'init') {
+            status[type] = 'loading';
+
+            callbacks[type].push(init);
+
+            load(config.protocol, newConfig.static_servers || newConfig.domains, newConfig[type] || newConfig.path,
+              null,
+              function (err) {
+                if (err) {
+                  status[type] = 'fail';
+                  throwError('networkError', config);
+                } else {
+                  status[type] = 'loaded';
+                  var cbs = callbacks[type];
+                  for (var i = 0, len = cbs.length; i < len; i = i + 1) {
+                    var cb = cbs[i];
+                    if (isFunction(cb)) {
+                      cb();
+                    }
+                  }
+                  callbacks[type] = [];
+                }
+              });
+          } else if (s === "loaded") {
+            init();
+          } else if (s === "fail") {
+            throwError('networkError', config);
+          } else if (s === "loading") {
+            callbacks[type].push(init);
+          }
+        });
+
+      };
+
+
+    })(window);
+  </script>
+  <script type="text/javascript" src="https://www.googletagmanager.com/gtag/js?id=UA-117913987-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+    // gtag('config', 'UA-117913987-1');
+    gtag("config", "UA-117913987-1", { 
+      "page_path": "/oauth/authorize"
+    });
+  </script>
+<script>
+  // 新增手机号登录
+  function changeTab(name) {
+    var emailEle = document.getElementById('email');
+    var phoneContainer = document.getElementById('select-phone-container');
+    var phoneEle = document.getElementById('phone_number');
+    var tabEmail = document.getElementById('tab-email');
+    var tabPhone = document.getElementById('tab-phone');
+    if (name == 'email') {
+      phoneContainer.className = 'none';
+      phoneEle.setAttribute('disabled',true);
+
+      emailEle.type = 'show';
+      emailEle.removeAttribute('disabled');
+
+      tabEmail.className = 'active';
+      tabPhone.className = '';
+    } else {
+      phoneContainer.className = 'flex';
+      phoneEle.removeAttribute('disabled');
+
+      emailEle.setAttribute('disabled',true);
+      emailEle.type = 'hidden';
+
+      tabEmail.className = '';
+      tabPhone.className = 'active';
+    }
+  }
+  function showOptions() {
+      var ele = document.getElementById('country-countainer');
+      if (ele.className == 'list-open') {
+          ele.className = '';
+      } else {
+          ele.className = 'list-open';
+      }
+  }
+  function clickOption(code) {
+      var codeEle = document.getElementById('country-code');
+      codeEle.setAttribute('value', code);
+      codeEle.textContent = '+' + code;
+      document.getElementById('country-countainer').className = '';
+  }
+  function createLi(obj) {
+      var nodeLi = document.createElement("LI");
+      nodeLi.setAttribute("onclick", "clickOption('" + obj.calling_codes[0] + "')");
+      var nodeSpan1 = document.createElement("SPAN");
+      // nodeSpan1.className = 'span1';
+      nodeSpan1.textContent = obj.name;
+
+      var nodeSpan2 = document.createElement("P");
+      // nodeSpan2.className = 'span2';
+      nodeSpan2.textContent = obj.calling_codes[0];
+
+      nodeLi.appendChild(nodeSpan1);
+      nodeLi.appendChild(nodeSpan2);
+      document.getElementById("country-list").appendChild(nodeLi);
+  }
+  function getCountries() {
+      var xhr = new XMLHttpRequest();
+      xhr.open(
+          "get",
+          "/api/v4/countries",
+          false);
+      xhr.onreadystatechange = function () {
+          if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+              let data = JSON.parse(xhr.responseText).body
+              for (var i = 0, len = data.length; i < len; i++) {
+                  createLi(data[i]);
+              }
+          }
+      }
+      xhr.send();
+  }
+  // getCountries();
+</script>
+</head>
+
+<body>
+  <div id="page">
+    <header>
+      <div class="logo_con"></div>
+    </header>
+    <div id="content">
+      <input id="need_geetest" name="need_geetest" value="{{ .NeedGeetest }}" />
+      <form id="no-token" action="/oauth/login" method="GET">
+        <input id="service_id" name="service_id" type="hidden" value="{{ .ServiceId }}" />
+        <input id="call_back_url" name="call_back_url" type="hidden" value="{{ .CallBackUrl }}" />
+        <div id="continer">
+          <div class="item title">{{ .LoginWitihRfinex }}</div>
+          <div class="tab-container">
+            <span id="tab-email" class="active" onclick="changeTab('email')">邮箱</span>
+            <span id="tab-phone" onclick="changeTab('phone')">手机号</span>
+          </div>
+          <div class="item input_con">
+            <input class="login_input" id="email" name="email" placeholder="{{ .RfinexAccount }}" />
+            <div class="none" id="select-phone-container">
+              <div class="phone_country">
+                  <dl class="country-countainer" id="country-countainer">
+                      <dt class="country-show" style="width: 100%;" onclick="showOptions()">
+                          <p class="area-code" id="country-code" value="86">+86</p>
+                          <div class="icon">
+                              <i class="hb_icon_arrow_down"></i>
+                          </div>
+                      </dt>
+                      <dd class="country-select">
+                          <div class="country-list-container">
+                              <dl class="coutry-li" style>
+                                  <dt>常用</dt>
+                                  <dd>
+                                      <ul id="country-list">
+                                      </ul>
+                                  </dd>
+                              </dl>
+                          </div>
+                      </dd>
+                  </dl>
+              </div>
+              <input class="login_input" id="phone_number1" placeholder="{{ .RfinexAccount }}" />
+              <input class="login_input" id="phone_number" name="phone_number" style="display: none"/>
+            </div>
+          </div>
+          <div class="item input_con">
+            <input class="login_input" type="password" id="password" name="password" placeholder="{{ .InputPassword }}" />
+          </div>
+          <div id="notice">
+            <label>
+              {{ .Notice }}
+            </label>
+          </div>
+          <div class="item login_btn" id='submit_bttn'>
+            <input class="login_input submit_btn" type="submit" value="{{ .Authorize }}" />
+          </div>
+
+
+          <div id="register-wrapper" class="btn_desc">
+            <div></div>
+            <div id="register" need-code="{{ .NeedCode }}">{{ .RegisterNow }}</div>
+          </div>
+        </div>
+      </form>
+
+      <form id="with-token" action="/oauth/login" method="GET" hidden>
+        <input id="service_id" name="service_id" type="hidden" value="{{.ServiceId}}" />
+        <input id="call_back_url" name="call_back_url" type="hidden" value="{{ .CallBackUrl }}" />
+        <input id="token" name="token" type="hidden" />
+        <input id="auto_login" name="auto_login" value="{{.AutoLogin}}" type="hidden" />
+
+        <div id="continer" style="height: 300px;">
+          <div class="item title">{{ .LoginWitihRfinex }}</div>
+          <div class="item" style="text-align:center;color: #999;font-size:14px;">
+            {{ .AlreadyLogin }}
+          </div>
+          <div class="item" style="text-align:center;color: #999;font-size:14px;">
+            {{ .AuthorizeAndAgree }}
+          </div>
+          <div class="item login_btn">
+            <input class="login_input submit_btn" type="submit" value="{{ .Authorize }}" />
+          </div>
+          <div id="register-wrapper" class="btn_desc" style="padding-bottom: 10px;">
+            <div id="other-login">{{ .OtherAccountLogin }}</div>
+            <div id="register" need-code="{{ .NeedCode }}">{{ .RegisterNow }}</div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    var gt_server_status, user_id, autoLogin, token, expire_at, now;
+    var queryToken = '';
+    var queryExpire = '';
+    window.onload = function () {
+      getToken()
+      if(autoLogin && token && expire_at){
+        document.querySelector('#with-token').submit();
+        return;
+      }
+      document.querySelectorAll('#register').forEach(function (item) {
+        item.addEventListener('click', function () {
+          var needCode = item.getAttribute("need-code")
+          var queryStr = location.search.slice(1)
+          var isAppQuery = ''
+          if(queryStr){
+            var list = queryStr.split('&')
+            if(list.length > 0){
+              var isApp = list.find(v => v.split('=')[0] == 'isApp')
+              if(isApp && isApp.split('=')[1] == "true"){
+                isAppQuery = 'isApp=true&'
+              }
+            }
+          }
+          if(needCode && needCode == "true"){
+            location.href = "/register_with_code?" + isAppQuery + "back_url=" + encodeURIComponent(location.href);
+          }else {
+            location.href = "/register?" + isAppQuery + "back_url=" + encodeURIComponent(location.href);
+          }
+          localStorage.setItem('refer', location.href)
+        })
+      })
+      document.getElementById('other-login').addEventListener('click', function () {
+        document.getElementById("no-token").hidden = false;
+        document.getElementById("with-token").hidden = true;
+      })
+      getInitData();
+      getCountries()
+    }
+
+    function getToken() {
+      autoLogin = document.querySelector('#auto_login').value;
+      now = new Date();
+      var queryArray = decodeURIComponent(location.search).split('?');
+      if(queryArray[1]){
+        queryArray[1].split('&').forEach(v => {
+          var list = v.split('=');
+          if(list[0] == 'token'){
+            queryToken = list[1];
+          }else if(list[0] == 'expire_at'){
+            queryExpire = list[1];
+          }
+        })
+      }
+      if(queryToken && queryExpire){
+        token = queryToken;
+        expire_at = new Date(queryExpire);
+        document.getElementById("token").value = token;
+      }else if (localStorage.token) {
+        token = JSON.parse(localStorage.token);
+        expire_at = new Date(token["expire_at"].replace(/-/g, "/"));
+        document.getElementById("token").value = JSON.parse(localStorage.token)["token"]
+      }else {
+        return
+      }
+      if (expire_at.getTime() > now.getTime()) {
+        document.getElementById("no-token").hidden = true;
+        document.getElementById("with-token").hidden = false;
+      } else {
+        localStorage.removeItem('token')
+      }
+    };
+
+    function getInitData() {
+      var xhr = new XMLHttpRequest();
+      xhr.open(
+        "get",
+        "/api/v4/geetest",
+        false);
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+          let data = JSON.parse(xhr.responseText).body
+          gt_server_status = data.success;
+          user_id = data.user_id;
+
+          initGeetest({
+            width: '100%',
+            gt: data.gt,
+            challenge: data.challenge,
+            product: 'bind',
+            offline: !data.success
+          }, geetestHandler);
+        }
+      }
+      xhr.send();
+    }
+
+    function geetestHandler(captchaObj) {
+
+      captchaObj.bindForm('#no-token');
+      captchaObj.onReady(() => {
+
+      }).onSuccess(() => {
+        var bt = document.getElementById('no-token')
+        bt.submit()
+      }).onError(() => {
+
+        captchaObj.reset()
+      })
+      document.getElementById('submit_bttn').onclick = function (event) {
+        var myform = document.getElementById("no-token")
+        // var myEmail = document.getElementById("email")
+        // var myPhoneNumber = document.getElementById("phone_number")
+        var myPhoneCode = document.getElementById("country-code")
+        var phoneInput = document.getElementById("phone_number1")
+        // var itemValue = myform.email.value;
+        // if(!itemValue.includes('@')){
+        //   myform.email.value = ''
+        //   myEmail.type="hidden"
+        //   myform.phone_number.value = itemValue
+        //   myPhoneNumber.type='show'
+        // }
+        var phoneCode = myPhoneCode && myPhoneCode.getAttribute('value') ? myPhoneCode.getAttribute('value') : '';
+        if (phoneCode) {
+          myform.phone_number.value = phoneCode + '' + phoneInput.value;
+        }
+        var flag = document.getElementById('need_geetest').value
+        if (flag == 'true') {
+          captchaObj.verify();
+          event.preventDefault()
+        } else {
+          var bt = document.getElementById('no-token')
+          bt.submit()
+        }
+
+      }
+    }
+  </script>
+</body>
+
+</html>
+
+{{end}}

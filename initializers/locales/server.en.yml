@@ -1,0 +1,112 @@
+en:
+  mailer:
+    dear_user: Dear user,
+    signature: Thanks,<br/>The Rfinex Team
+    please_contact: If it's not you, please <a href='mailto:{{contact_mail}}'>contact us</a> ASAP.
+    footer: This is an automatically generated email, please do not reply, if you have any question, please <a href="mailto:{{contact_mail}}">contact us</a>.
+  comment_mailer:
+    admin_notification:
+      subject: "[Rfinex] User reply a ticket"
+      notification_content: User {{email}} reply a ticket, please follow the link below to see the detail
+    user_notification:
+      subject: "[Rfinex] Your ticket got a new reply"
+      notification_content: 'Your ticket got a new reply, please follow the link below to see the detail:'
+  deposit_mailer:
+    accepted:
+      subject: "[Rfinex] Your deposit has been credited into your account"
+      content: Your {{currency}} deposit has been credited into your account.
+  user_mailer:
+    notify_signin:
+      subject: "[Rfinex] You have just signed in"
+      just_signed_in: You have just signed in.
+    google_auth_activated:
+      subject: "[Rfinex] Google Authenticator activated"
+      google_auth_activated: You have activated Google authenticator successfully
+    google_auth_deactivated:
+      subject: "[Rfinex] Google Authenticator deactivated"
+      google_auth_deactivated: You have deactivated Google Authenticator successfully
+    sms_auth_activated:
+      subject: "[Rfinex] SMS authenticator activated"
+      sms_auth_activated: You have activated SMS authenticator successfully
+    sms_auth_deactivated:
+      subject: "[Rfinex] SMS authenticator deactivated"
+      sms_auth_deactivated: You have deactivated SMS authenticator successfully
+    reset_password_done:
+      subject: "[Rfinex] Your password changed"
+      successful: Your password has been changed successfully.
+    phone_number_verified:
+      subject: "[Rfinex] Your phone number verified"
+      verified: 'Your phone number verified: {{phone_number}}'
+  system_mailer:
+    daily_stats:
+      user_stats: User Stats
+      signup: Signup
+      activation: Activation
+      asset_stats: Assets Changes
+      trade_stats: Trades Changes
+      asset_value_change_total: Digital Assets Changes Total
+      trades_change_total: Trades Changes Total
+  ticket_mailer:
+    admin_notification:
+      subject: "[Rfinex] User created a new ticket"
+      admin_notification_content: User {{email}} created a new ticket, please follow the link below to see the detail
+    author_notification:
+      subject: "[Rfinex] Thank you for submit ticket"
+      thanks_for_submit_ticket: Thank you for submit ticket to us, we will get back to you as soon as possible.
+  token_mailer:
+    activation:
+      subject: "[Rfinex] Account Activation"
+      click_to_verify: 'Thank you for signing up on Rfinex, please follow this link to verify your Email:'
+      unable_to_click: Copy and open the link in your browser if you are unable to click and visit it.
+      link_expire: The link expires in 30 minutes.
+    app_reset_password:
+      subject: "{{.token}}is your verification code "
+      hi: Dear user{{.email}}, you are in the process of modifying or setting. Please verify your account and complete the modification or setting
+      follow_token: "{{.token}} is your verification code "
+    set_fund_password:
+      subject: "{{.token}}is your verification code "
+      hi: Dear user{{.email}}, you are in the process of modifying or setting. Please verify your account and complete the modification or setting
+      follow_token: "{{.token}}is your verification code "
+    bind_email:
+      subject: "{{.token}}is your verification code "
+      hi: Dear user{{.email}}, you are in the process of modifying or setting. Please verify your account and complete the modification or setting
+      follow_token: "{{.token}}is your verification code "
+    email_code_verified:
+      subject: "{{.token}}is your verification code "
+      hi: Dear user{{.email}}, you are in the process of modifying or setting. Please verify your account and complete the modification or setting
+      follow_token: "{{.token}}is your verification code "
+  otc_order_mailer:
+    order_volume: The transaction amount of this order is {{volume}} {{currency_upcase}}.
+    buy_order_created:
+      order_created:  initiated a purchase request from you at {{created_at}}. Order number is {{order_no}} .
+    buy_order_paid:
+      order_paid:   paid at {{paid_at}}. Order number is {{order_no}}, confirm timely please.
+    buy_order_finished:
+      order_finished:  confirmed the receipt at {{finished_at}}. The transaction has been completed. Order number is {{order_no}}.
+    buy_order_cancelled:
+      order_cancelled: Order has been cancelled. Order number is {{order_no}}, confirm timely please.
+    buy_order_freezed:
+      order_frozen: Order has been frozen, order number is {{order_no}}, confirm timely please.
+    sell_order_created:
+      order_created:  initiated a sale request from you at {{created_at}}, Order number is {{order_no}} .
+    sell_order_paid:
+      order_paid:  paid at {{paid_at}}，Order number is {{order_no}}, confirm timely please.
+    sell_order_finished:
+      order_finished:  confirmed the receipt at {{finished_at}}. The transaction has been completed. Order number is {{order_no}}.
+    sell_order_cancelled:
+      order_cancelled: Order has been cancelled. Order number is {{order_no}}, confirm timely please.
+    sell_order_freezed:
+      order_frozen: Order has been frozen, order number is {{order_no}}, confirm timely please.
+  withdraw_mailer:
+    submitted:
+      subject: "[Rfinex] Your withdraw state update"
+      content: The request of your {{currency}} withdrawal has been successfully submitted, We will process it as soon as possible. Please be patient with us. Contact us if you have any questions.
+    processing:
+      subject: "[Rfinex] Your withdraw state update"
+      content: The request of your {{currency}} withdrawal is in process. Please be patient with us. Contact us if you have any questions.
+    done:
+      subject: "[Rfinex] Your withdraw state update"
+      content: The request of your {{currency}} withdrawal is complete. Please check it out. Contact us if you have any questions.
+    withdraw_state:
+      subject: "[Rfinex] Your withdraw state update"
+      your_state: 'Your withdrawal state: '

@@ -1,0 +1,79 @@
+'zh-CN':
+  cas:
+    notice:
+      no_user: 账号或密码错误
+      no_otp: 未绑定二步验证
+      amount: 支付数量
+      input_otp: 请输入Google动态验证码
+      submmit_to_pay: 确认支付
+      login_witih_rfinex: Rfinex账号登录
+      rfinex_account: Rfinex账号
+      input_password: 输入密码
+      authorize: 授权并登录
+      authorize_and_agree: 点击授权并登录，表示您已同意
+      protocol_from_rfinex: Rfinex登录服务协议
+      withdraw_amount: 支付数量
+      submmit_to_withdraw: 确认支付
+      register_now: 立即注册
+      already_login: 您已登录
+      other_account_login: 其他账号登录
+
+'en':
+  cas:
+    notice:
+      no_user: Wrong account or password
+      no_otp: No two factor can be found
+      amount: amount
+      input_otp: Please enter a Google Dynamics Caption
+      submmit_to_pay: Confirm payment
+      login_witih_rfinex: Rfinex account login
+      rfinex_account: Rfinex account
+      input_password: Enter the password
+      authorize: Authorize and log in
+      authorize_and_agree: Click on the authorization and log in to indicate that you have agreed
+      protocol_from_rfinex: Rfinex Login Service Agreement
+      withdraw_amount: amount
+      submmit_to_withdraw: Confirm payment
+      register_now: register now
+      already_login: already login
+      other_account_login: Other account login
+
+'ko':
+  cas:
+    notice:
+      no_user: 아이디나 비밀번호가 정확하지
+      no_otp: 2단계 인증을 하지 않았습니다
+      amount: 지불수량
+      input_otp: Google OTP 수량
+      submmit_to_pay: 지불 확인
+      login_witih_rfinex: Rfinex 계정 등록
+      rfinex_account: Rfinex 계정
+      input_password: 비밀번호 입력
+      authorize: 허락 및 등록
+      authorize_and_agree: 허락 및 등록 클릭, 동의함을 의미함
+      protocol_from_rfinex: Rfinex 서비스협의 등록
+      withdraw_amount: 지불수량
+      submmit_to_withdraw: 지불확인
+      register_now: 지금 등록하십시오
+      already_login: 벌써 로그인
+      other_account_login: 다른 계정 로그인
+
+'ja':
+  cas:
+    notice:
+      no_user: アカウントまたはパスワードが正しくありません
+      no_otp: アンバウンド2段階認証プロセス
+      amount: 支払額
+      input_otp: OTPコードを入力してください
+      submmit_to_pay: 支払いを確認する
+      login_witih_rfinex: Rfinexアカウントのログイン
+      rfinex_account: Rfinexアカウント
+      input_password: パスワードを入力してください
+      authorize: 承認およびログイン
+      authorize_and_agree: 承認をクリックしてログインし、あなたが同意したことを示します
+      protocol_from_rfinex: Rfinexログインサービス契約
+      withdraw_amount: 支払い金額
+      submmit_to_withdraw: 支払いを確認する
+      register_now: 今すぐ登録
+      already_login: 既にログインしています
+      other_account_login: 他のアカウントのログイン
