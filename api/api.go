@@ -37,28 +37,22 @@ func main() {
 	initialize()
 	sneakerWorkers.InitWorkers()
 	e := echo.New()
-
 	e.File("/web", "public/assets/index.html")
 	e.File("/web/*", "public/assets/index.html")
 	e.Static("/assets", "public/assets")
-
 	if envConfig.CurrentEnv.Newrelic.AppName != "" && envConfig.CurrentEnv.Newrelic.LicenseKey != "" {
 		e.Use(newrelic.NewRelic(envConfig.CurrentEnv.Newrelic.AppName, envConfig.CurrentEnv.Newrelic.LicenseKey))
 	}
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(initializers.Auth)
-
 	routes.SetWebInterfaces(e)
 	routes.SetOauthInterfaces(e)
-
 	e.HTTPErrorHandler = customHTTPErrorHandler
-
 	t := &Template{
 		templates: template.Must(template.ParseGlob("public/api/*/*.html")),
 	}
 	e.Renderer = t
-
 	e.HideBanner = true
 	go func() {
 		if err := e.Start(":9700"); err != nil {
@@ -68,7 +62,6 @@ func main() {
 			log.Println("shutting down the server")
 		}
 	}()
-
 	quit := make(chan os.Signal)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
@@ -101,7 +94,6 @@ func initialize() {
 	initializers.InitializeAmqpConfig()
 	initializers.LoadInterfaces()
 	initializers.LoadCacheData()
-
 	setLog()
 	setPid()
 }

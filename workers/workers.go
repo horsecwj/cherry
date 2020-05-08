@@ -28,12 +28,8 @@ func main() {
 
 func initialize() {
 	initializers.InitializeAmqpConfig()
-
 	setLog()
-	err := ioutil.WriteFile("pids/workers.pid", []byte(strconv.Itoa(os.Getpid())), 0644)
-	if err != nil {
-		log.Println(err)
-	}
+	setPid()
 }
 
 func closeResource() {
@@ -65,4 +61,17 @@ func setLog() {
 		log.Fatalf("open file error: %v", err)
 	}
 	log.SetOutput(file)
+}
+
+func setPid() {
+	err := os.Mkdir("pids", 0755)
+	if err != nil {
+		if !os.IsExist(err) {
+			log.Fatalf("create folder error: %v", err)
+		}
+	}
+	err = ioutil.WriteFile("pids/workers.pid", []byte(strconv.Itoa(os.Getpid())), 0644)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
 }
