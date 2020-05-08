@@ -18,13 +18,10 @@
   method: POST
   auth: true
   sign: true
-  currency_can_transfer: true
 - path: /oauth/transfers/back
   method: POST
   auth: true
-  trust: true
   sign: true
-  currency_can_transfer: true
 
 ## user
 - path: /oauth/authorize
