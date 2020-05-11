@@ -33,9 +33,7 @@ func (worker Worker) TransferNotifyWorker(payloadJson *[]byte) (err error) {
 	if transfer.IsDone() || transfer.IsCanceled() {
 		return
 	}
-	transfer.NotifyTimes += 1
-	mainDB.Save(&transfer)
-	mainDB.DbCommit()
+	mainDB.DbRollback()
 
 	urlStruct, _ := url.Parse(payload["notify_url"])
 	values := urlStruct.Query()

@@ -15,10 +15,10 @@ func (worker Worker) GrantCancelWorker(payloadJson *[]byte) (err error) {
 	defer mainDB.DbRollback()
 	var transfer Transfer
 	mainDB.Where("id = ?", payload["transfer_id"]).First(&transfer)
-	if transfer.IsDone() || transfer.IsCanceled() {
-		return
-	} else {
+	if transfer.IsGranting() {
 		transfer.State = "canceled"
+	} else {
+		worker.LogError("transfer type is error, transfer id: ", payload["transfer_id"])
 	}
 	mainDB.Save(&transfer)
 	mainDB.DbCommit()

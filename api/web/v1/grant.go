@@ -48,7 +48,8 @@ func PostGrantCreate(context echo.Context) error {
 		Amount:     amount,
 		CurrencyId: currency.Id,
 		ServiceId:  service.Id,
-		State:      "pending",
+		State:      "granting",
+		Grant:      true,
 	}
 	err := tryLockFunds(&transfer, 9)
 	if err != nil {

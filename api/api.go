@@ -65,12 +65,14 @@ func main() {
 	quit := make(chan os.Signal)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
-	fmt.Println("accepted signal")
+	log.Println("accepted signal")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := e.Shutdown(ctx); err != nil {
-		fmt.Println("shutting down failed, err:" + err.Error())
+		log.Println("shutting down failed, err:" + err.Error())
 		e.Logger.Fatal(err)
+	} else {
+		log.Println("shutting down complete.")
 	}
 	closeResource()
 }
