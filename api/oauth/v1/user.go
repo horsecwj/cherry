@@ -2,6 +2,7 @@ package v1
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -77,7 +78,6 @@ func GetOauthAuthorization(context echo.Context) error {
 
 func OauthLogin(context echo.Context) error {
 	params := context.Get("params").(map[string]string)
-	language := context.Get("language").(string)
 	callBackUrl := context.QueryParam("callback_url")
 	appKey := context.QueryParam("app_key")
 	dataRedis := utils.GetRedisConn("data")
@@ -95,15 +95,15 @@ func OauthLogin(context echo.Context) error {
 
 	var identity Identity
 	if db.Where("`source` = ?", params["source"]).Where("symbol").First(&identity).RecordNotFound() {
-		loginError(context, dataRedis, service.AppKey, callBackUrl, language)
+		loginError(context)
 	}
 	var user User
 	if db.Where("id = ?", identity.UserId).First(&user).RecordNotFound() {
-		loginError(context, dataRedis, service.AppKey, callBackUrl, language)
+		loginError(context)
 	}
 	user.Password = context.QueryParam("password")
 	if !user.CompareHashAndPassword() {
-		loginError(context, dataRedis, service.AppKey, callBackUrl, language)
+		loginError(context)
 	}
 
 	authorizationhCode := AuthorizationhCode{UserId: user.Id, ServiceId: service.Id}
@@ -188,7 +188,7 @@ func GetOauthUserInfo(context echo.Context) error {
 	defer db.DbRollback()
 	var app Service
 	if db.Where("app_key = ?", context.QueryParam("app_key")).First(&app).RecordNotFound() {
-		return utils.BuildError("3037")
+		return utils.BuildError("1102")
 	}
 	response := utils.SuccessResponse
 	var smsTwoFactor TwoFactor
@@ -206,29 +206,8 @@ func GetOauthUserInfo(context echo.Context) error {
 	return context.JSON(http.StatusOK, response)
 }
 
-func loginError(context echo.Context, dataRedis redis.Conn, appKey, callBackUrl, language string) error {
-	fmt.Println("{ error:", "登录密码错误,", "账号: ", context.FormValue("email"), "提交的密码:", "-->"+context.FormValue("password")+"<--", "}")
-	key := "limit-traffic-with-ip-" + context.RealIP()
-	timesStr, _ := redis.String(dataRedis.Do("GET", key))
-	var needGeetest bool
-	if timesStr == "" {
-		dataRedis.Do("Set", key, 1)
-		dataRedis.Do("EXPIRE", key, 600)
-	} else {
-		dataRedis.Do("INCR", key)
-		needGeetest = true
-	}
-	data := DataStruct{
-		AppKey:             appKey,
-		CallbackUrl:        callBackUrl,
-		Notice:             fmt.Sprint(I18n.T(language, "oauth.notice.no_user")),
-		LoginWitihRfinex:   fmt.Sprint(I18n.T(language, "oauth.notice.login_witih_rfinex")),
-		RfinexAccount:      fmt.Sprint(I18n.T(language, "oauth.notice.rfinex_account")),
-		InputPassword:      fmt.Sprint(I18n.T(language, "oauth.notice.input_password")),
-		Authorize:          fmt.Sprint(I18n.T(language, "oauth.notice.authorize")),
-		AuthorizeAndAgree:  fmt.Sprint(I18n.T(language, "oauth.notice.authorize_and_agree")),
-		ProtocolFromRfinex: fmt.Sprint(I18n.T(language, "oauth.notice.protocol_from_rfinex")),
-		NeedGeetest:        needGeetest,
-	}
-	return context.Render(http.StatusOK, "login", data)
+func loginError(context echo.Context) error {
+	params := context.Get("params").(map[string]string)
+	log.Println("{ error:", "登录密码错误,source:", params["source"], "账号: ", params["symbol"], "提交的密码:", "-->"+params["password"]+"<--", "}")
+	return utils.BuildError("1101")
 }

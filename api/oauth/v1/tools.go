@@ -3,6 +3,7 @@ package v1
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
@@ -81,7 +82,7 @@ func pushMessageToEmail(payload *map[string]string) {
 	}
 	b, err := json.Marshal(*payload)
 	if err != nil {
-		fmt.Println("{ error:", err, "}")
+		log.Println(err)
 		panic(err)
 	}
 	err = initializers.PublishMessageWithRouteKey(
@@ -93,7 +94,7 @@ func pushMessageToEmail(payload *map[string]string) {
 		amqp.Persistent,
 	)
 	if err != nil {
-		fmt.Println("{ error:", err, "}")
+		log.Println(err)
 		panic(err)
 	}
 }

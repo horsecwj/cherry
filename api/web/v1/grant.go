@@ -27,20 +27,20 @@ func PostGrantCreate(context echo.Context) error {
 	service := context.Get("current_service").(Service)
 	if service.Id == 0 {
 		if mainDB.Where("aasm_state = ? AND app_key = ?", "verified", params["app_key"]).First(&service).RecordNotFound() {
-			return utils.BuildError("3037")
+			return utils.BuildError("1102")
 		}
 	}
 	if service.CanNotGrant() {
-		return utils.BuildError("3048")
+		return utils.BuildError("1106")
 	}
 	amount, _ := decimal.NewFromString(params["amount"])
 	amount = amount.Truncate(8)
 	if amount.LessThanOrEqual(decimal.Zero) {
-		return utils.BuildError("3046")
+		return utils.BuildError("1105")
 	}
 	currency, e := FindCurrencyBySymbol(params["currency"])
 	if e != nil {
-		return utils.BuildError("3027")
+		return utils.BuildError("1107")
 	}
 	transfer := Transfer{
 		From:       user.Id,
@@ -81,26 +81,26 @@ func GrantConfirm(context echo.Context) error {
 	service := context.Get("current_service").(Service)
 	if service.Id == 0 {
 		if mainDB.Where("aasm_state = ? AND app_key = ?", "verified", params["app_key"]).First(&service).RecordNotFound() {
-			return utils.BuildError("3037")
+			return utils.BuildError("1102")
 		}
 	}
 	if mainDB.Where("id = ?", params["transfer_id"]).First(&transfer).RecordNotFound() {
-		return utils.BuildError("3049")
+		return utils.BuildError("1108")
 	}
 	if transfer.ServiceId != service.Id {
-		return utils.BuildError("3049")
+		return utils.BuildError("1109")
 	}
 	if !transfer.IsDone() {
 		var currency Currency
 		if mainDB.Where("code = ?", params["currency"]).First(&currency).RecordNotFound() {
-			return utils.BuildError("3027")
+			return utils.BuildError("1107")
 		}
 		amount, _ := decimal.NewFromString(params["amount"])
 		if transfer.Amount.Equal(amount) {
-			return utils.BuildError("3028")
+			return utils.BuildError("1110")
 		}
 		if transfer.CurrencyId == currency.Id {
-			return utils.BuildError("3029")
+			return utils.BuildError("1111")
 		}
 		transfer.Sn = params["sn"]
 		err := grantToTargetAccount(&transfer, 50)
@@ -124,15 +124,15 @@ func tryLockFunds(transfer *Transfer, times int) error {
 		account.Locked = decimal.Zero
 		mainDB.Save(&account)
 		mainDB.DbCommit()
-		return utils.BuildError("3041")
+		return utils.BuildError("1103")
 	}
 
 	if account.Balance.Sub((*transfer).Amount).IsNegative() {
-		return utils.BuildError("3041")
+		return utils.BuildError("1103")
 	}
 	mainDB.Create(transfer)
 	if (*transfer).Id == 0 {
-		return utils.BuildError("3054")
+		return utils.BuildError("1112")
 	}
 	ferr := account.LockFunds(mainDB, (*transfer).Amount, GRAINT_LOCK, (*transfer).Id, "Transfer")
 	if ferr == nil {
@@ -144,7 +144,7 @@ func tryLockFunds(transfer *Transfer, times int) error {
 		(*transfer).Id = 0
 		return tryLockFunds(transfer, times-1)
 	}
-	return utils.BuildError("3038")
+	return utils.BuildError("1104")
 }
 
 func grantToTargetAccount(transfer *Transfer, times int) error {
@@ -158,7 +158,7 @@ func grantToTargetAccount(transfer *Transfer, times int) error {
 		fromAccount.Locked = decimal.Zero
 		mainDB.Save(&fromAccount)
 		mainDB.DbCommit()
-		return utils.BuildError("3041")
+		return utils.BuildError("1103")
 	}
 	if mainDB.Where("user_id = ?", (*transfer).To).Where("currency = ?", (*transfer).CurrencyId).First(&toAccount).RecordNotFound() {
 		toAccount.UserId = (*transfer).To
@@ -169,7 +169,7 @@ func grantToTargetAccount(transfer *Transfer, times int) error {
 	}
 
 	if fromAccount.Locked.Sub((*transfer).Amount).IsNegative() {
-		return utils.BuildError("3041")
+		return utils.BuildError("1103")
 	}
 	(*transfer).State = "done"
 	ferr := fromAccount.UnlockedAndSubFunds(mainDB, (*transfer).Amount, (*transfer).Amount, decimal.Zero, GRAINT_SUB_LOCK, (*transfer).Id, "Transfer")
@@ -184,7 +184,7 @@ func grantToTargetAccount(transfer *Transfer, times int) error {
 		(*transfer).Id = 0
 		return grantToTargetAccount(transfer, times-1)
 	}
-	return utils.BuildError("3038")
+	return utils.BuildError("1104")
 }
 
 var grantRoutingKey, grantCancelQueue string
@@ -206,14 +206,14 @@ func sendMessageToGrantNotifyUrl(message *map[string]string) {
 	}
 	b, err := json.Marshal(*message)
 	if err != nil {
-		log.Println("ERROR:", err)
+		log.Println(err)
 	}
 	err = initializers.PublishMessageWithRouteKey(initializers.AmqpGlobalConfig.Exchange["default"]["name"], grantRoutingKey, "text/plain", &b, amqp.Table{}, amqp.Persistent)
 	if err != nil {
-		log.Println("ERROR:", err)
+		log.Println(err)
 	}
 	err = initializers.PublishMessageToQueue(grantCancelQueue, "text/plain", &b, amqp.Table{}, amqp.Persistent)
 	if err != nil {
-		log.Println("ERROR:", err)
+		log.Println(err)
 	}
 }

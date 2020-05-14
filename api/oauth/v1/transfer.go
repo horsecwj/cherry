@@ -2,7 +2,7 @@ package v1
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -26,11 +26,11 @@ func GetTransfer(context echo.Context) error {
 	defer mainDb.DbRollback()
 	var service Service
 	if mainDb.Where("app_key = ?", params["app_key"]).First(&service).RecordNotFound() {
-		return utils.BuildError("3037")
+		return utils.BuildError("1102")
 	}
 	var transfer Transfer
 	if mainDb.Where("sn = ? AND service_id = ?", params["sn"], service.Id).First(&transfer).RecordNotFound() {
-		return utils.BuildError("3039")
+		return utils.BuildError("1113")
 	}
 	response := utils.SuccessResponse
 	response.Body = transfer
@@ -46,13 +46,13 @@ func PostTransfersCreate(context echo.Context) error {
 		return context.JSON(http.StatusForbidden, map[string]string{"message": "Invalid notify_url."})
 	}
 	if params["currency"] == "" {
-		return utils.BuildError("3027")
+		return utils.BuildError("1107")
 	}
 
 	amount, _ := decimal.NewFromString(params["amount"])
 	amount = amount.Truncate(8)
 	if amount.LessThanOrEqual(decimal.Zero) {
-		return utils.BuildError("3046")
+		return utils.BuildError("1105")
 	}
 
 	mainDb := utils.MainDbBegin()
@@ -60,7 +60,7 @@ func PostTransfersCreate(context echo.Context) error {
 
 	var currency Currency
 	if mainDb.Where("code = ?", params["currency"]).First(&currency).RecordNotFound() {
-		return utils.BuildError("3027")
+		return utils.BuildError("1107")
 	}
 
 	transfer := Transfer{
@@ -71,6 +71,9 @@ func PostTransfersCreate(context echo.Context) error {
 		ServiceId:  service.Id,
 		Sn:         params["sn"],
 		State:      "pending",
+	}
+	if !mainDb.Where("service_id = ?", service.Id).Where("sn = ?", params["sn"]).Find(&Transfer{}).RecordNotFound() {
+		return utils.BuildError("1114")
 	}
 	mainDb.DbRollback()
 	err := transferToChangeAccount(&transfer, 9)
@@ -105,19 +108,19 @@ func PostTransfersBack(context echo.Context) error {
 	amount, _ := decimal.NewFromString(params["amount"])
 	amount = amount.Truncate(8)
 	if amount.LessThanOrEqual(decimal.Zero) {
-		return utils.BuildError("3046")
+		return utils.BuildError("1105")
 	}
 
 	mainDb := utils.MainDbBegin()
 	defer mainDb.DbRollback()
 	var currency Currency
 	if mainDb.Where("code = ?", params["currency"]).First(&currency).RecordNotFound() {
-		return utils.BuildError("3027")
+		return utils.BuildError("1107")
 	}
 
 	transfer := Transfer{
-		To:         user.Id,
 		From:       service.UserId,
+		To:         user.Id,
 		Amount:     amount,
 		CurrencyId: currency.Id,
 		ServiceId:  service.Id,
@@ -125,7 +128,7 @@ func PostTransfersBack(context echo.Context) error {
 		State:      "pending",
 	}
 	if !mainDb.Where("service_id = ?", service.Id).Where("sn = ?", params["sn"]).Find(&Transfer{}).RecordNotFound() {
-		return utils.BuildError("3045")
+		return utils.BuildError("1114")
 	}
 	mainDb.DbRollback()
 	err := transferToChangeAccount(&transfer, 3)
@@ -160,7 +163,7 @@ func transferToChangeAccount(transfer *Transfer, times int) error {
 		fromAccount.Locked = decimal.Zero
 		mainDb.Save(&fromAccount)
 		mainDb.DbCommit()
-		return utils.BuildError("3041")
+		return utils.BuildError("1103")
 	}
 	if mainDb.Where("user_id = ?", (*transfer).To).Where("currency = ?", (*transfer).CurrencyId).First(&toAccount).RecordNotFound() {
 		toAccount.UserId = transfer.To
@@ -171,12 +174,12 @@ func transferToChangeAccount(transfer *Transfer, times int) error {
 	}
 
 	if fromAccount.Balance.Sub(transfer.Amount).IsNegative() {
-		return utils.BuildError("3041")
+		return utils.BuildError("1103")
 	}
 	transfer.State = "done"
 	mainDb.Create(transfer)
 	if transfer.Id == 0 {
-		return utils.BuildError("3054")
+		return utils.BuildError("1112")
 	}
 	err1 := fromAccount.SubFunds(mainDb, (*transfer).Amount, decimal.Zero, TRANSFER_BACK, (*transfer).Id, "Transfer")
 	err2 := toAccount.PlusFunds(mainDb, (*transfer).Amount, decimal.Zero, TRANSFER, (*transfer).Id, "Transfer")
@@ -190,7 +193,7 @@ func transferToChangeAccount(transfer *Transfer, times int) error {
 		(*transfer).Id = 0
 		return transferToChangeAccount(transfer, times-1)
 	}
-	return utils.BuildError("3038")
+	return utils.BuildError("1104")
 }
 
 func sendMessageToNotifyUrl(notify_url string, message *map[string]string) {
@@ -207,7 +210,7 @@ func sendMessageToNotifyUrl(notify_url string, message *map[string]string) {
 	}
 	b, err := json.Marshal(params)
 	if err != nil {
-		fmt.Println("{ error:", err, "}")
+		log.Println(err)
 		panic(err)
 	}
 	err = initializers.PublishMessageWithRouteKey(
@@ -219,7 +222,7 @@ func sendMessageToNotifyUrl(notify_url string, message *map[string]string) {
 		amqp.Persistent,
 	)
 	if err != nil {
-		fmt.Println("{ error:", err, "}")
+		log.Println(err)
 		panic(err)
 	}
 }
