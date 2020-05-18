@@ -98,6 +98,7 @@ func initialize() {
 	initializers.InitializeAmqpConfig()
 	initializers.LoadInterfaces()
 	initializers.LoadCacheData()
+	initializers.InitAllPayments()
 	setLog()
 	setPid()
 }

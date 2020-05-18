@@ -16,12 +16,10 @@ import (
 type Account struct {
 	CommonModel
 
-	UserId         int             `json:"user_id"`                                      // 所属用户
-	CurrencyId     int             `json:"currency_id"`                                  // 币种
-	Balance        decimal.Decimal `gorm:"type:decimal(32,2);default:0;" json:"balance"` // 可用余额
-	Locked         decimal.Decimal `gorm:"type:decimal(32,2);default:0;" json:"locked"`  // 锁定余额
-	ModifiableId   int             `gorm:"default:0;" json:"modifiable_id"`              // 本账户所属的activity_id或者其它id
-	ModifiableType string          `gorm:"default:'Normal';" json:"modifiable_type"`     // Normal,Activity或其它
+	UserId     int             `json:"user_id"`                                      // 所属用户
+	CurrencyId int             `json:"currency_id"`                                  // 币种
+	Balance    decimal.Decimal `gorm:"type:decimal(32,2);default:0;" json:"balance"` // 可用余额
+	Locked     decimal.Decimal `gorm:"type:decimal(32,2);default:0;" json:"locked"`  // 锁定余额
 
 	// 以下字段不存入数据库
 	Options      []int    `sql:"-" json:"options"`

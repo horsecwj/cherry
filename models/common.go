@@ -13,6 +13,7 @@ const (
 var (
 	UNKNOWN              = 0   // 未知类型
 	FIX                  = 1   // 修复
+	RECHARGE             = 100 // 充值
 	TRANSFER             = 700 // 转账入金
 	TRANSFER_BACK_LOCK   = 705 // 转账出金锁币
 	TRANSFER_BACK_UNLOCK = 706 // 转账出金锁定的币解锁

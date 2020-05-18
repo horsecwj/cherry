@@ -10,14 +10,13 @@ import (
 	"github.com/gomodule/redigo/redis"
 	"github.com/labstack/echo"
 
-	"cherry/initializers/locale"
 	. "cherry/models"
 	"cherry/utils"
 )
 
 type DataStruct struct {
 	AppKey             string
-	CallbackUrl        string
+	RedirectUri        string
 	Notice             string
 	LoginWitihRfinex   string
 	RfinexAccount      string
@@ -32,23 +31,8 @@ type DataStruct struct {
 }
 
 func GetOauthAuthorization(context echo.Context) error {
-	var language string
-	var lqs []locale.LangQ
-	if context.QueryParam("lang") != "" {
-		lqs = locale.ParseAcceptLanguage(context.QueryParam("lang"))
-	} else {
-		lqs = locale.ParseAcceptLanguage(context.Request().Header.Get("Accept-Language"))
-	}
-	if lqs[0].Lang == "en" {
-		language = "en"
-	} else if lqs[0].Lang == "ja" {
-		language = "ja"
-	} else if lqs[0].Lang == "ko" {
-		language = "ko"
-	} else {
-		language = "zh-CN"
-	}
-	callBackUrl := context.QueryParam("callback_url")
+	lang := context.Get("language").(string)
+	redirectUri := context.QueryParam("redirect_uri")
 	appKey := context.QueryParam("app_key")
 	db := utils.MainDbBegin()
 	defer db.DbRollback()
@@ -56,29 +40,29 @@ func GetOauthAuthorization(context echo.Context) error {
 	if db.Where("app_key = ?", appKey).Where("Aasm_State = ?", "verified").First(&service).RecordNotFound() {
 		return context.JSON(http.StatusForbidden, map[string]string{"message": "Invalid app_key."})
 	}
-	urlStruct, _ := url.Parse(callBackUrl)
+	urlStruct, _ := url.Parse(redirectUri)
 	if !service.ValidataHost(urlStruct.Host) {
-		return context.JSON(http.StatusForbidden, map[string]string{"message": "Invalid callback_url."})
+		return context.JSON(http.StatusForbidden, map[string]string{"message": "Invalid redirect_uri."})
 	}
 	data := DataStruct{
 		AppKey:             service.AppKey,
-		CallbackUrl:        callBackUrl,
-		LoginWitihRfinex:   fmt.Sprint(I18n.T(language, "oauth.notice.login_witih_rfinex")),
-		RfinexAccount:      fmt.Sprint(I18n.T(language, "oauth.notice.rfinex_account")),
-		InputPassword:      fmt.Sprint(I18n.T(language, "oauth.notice.input_password")),
-		Authorize:          fmt.Sprint(I18n.T(language, "oauth.notice.authorize")),
-		AuthorizeAndAgree:  fmt.Sprint(I18n.T(language, "oauth.notice.authorize_and_agree")),
-		ProtocolFromRfinex: fmt.Sprint(I18n.T(language, "oauth.notice.protocol_from_rfinex")),
-		RegisterNow:        fmt.Sprint(I18n.T(language, "oauth.notice.register_now")),
-		AlreadyLogin:       fmt.Sprint(I18n.T(language, "oauth.notice.already_login")),
-		OtherAccountLogin:  fmt.Sprint(I18n.T(language, "oauth.notice.other_account_login")),
+		RedirectUri:        redirectUri,
+		LoginWitihRfinex:   fmt.Sprint(I18n.T(lang, "oauth.notice.login_witih_rfinex")),
+		RfinexAccount:      fmt.Sprint(I18n.T(lang, "oauth.notice.rfinex_account")),
+		InputPassword:      fmt.Sprint(I18n.T(lang, "oauth.notice.input_password")),
+		Authorize:          fmt.Sprint(I18n.T(lang, "oauth.notice.authorize")),
+		AuthorizeAndAgree:  fmt.Sprint(I18n.T(lang, "oauth.notice.authorize_and_agree")),
+		ProtocolFromRfinex: fmt.Sprint(I18n.T(lang, "oauth.notice.protocol_from_rfinex")),
+		RegisterNow:        fmt.Sprint(I18n.T(lang, "oauth.notice.register_now")),
+		AlreadyLogin:       fmt.Sprint(I18n.T(lang, "oauth.notice.already_login")),
+		OtherAccountLogin:  fmt.Sprint(I18n.T(lang, "oauth.notice.other_account_login")),
 	}
 	return context.Render(http.StatusOK, "oauth/login", data)
 }
 
 func OauthLogin(context echo.Context) error {
 	params := context.Get("params").(map[string]string)
-	callBackUrl := context.QueryParam("callback_url")
+	redirectUri := context.QueryParam("redirect_uri")
 	appKey := context.QueryParam("app_key")
 	dataRedis := utils.GetRedisConn("data")
 	defer dataRedis.Close()
@@ -88,9 +72,9 @@ func OauthLogin(context echo.Context) error {
 	if db.Where("app_key = ?", appKey).Where("Aasm_State = ?", "verified").First(&service).RecordNotFound() {
 		return context.JSON(http.StatusForbidden, map[string]string{"message": "Invalid app_key."})
 	}
-	callbackUrlStruct, _ := url.Parse(callBackUrl)
+	callbackUrlStruct, _ := url.Parse(redirectUri)
 	if !service.ValidataHost(callbackUrlStruct.Host) {
-		return context.JSON(http.StatusForbidden, map[string]string{"message": "Invalid callback_url."})
+		return context.JSON(http.StatusForbidden, map[string]string{"message": "Invalid redirect_uri."})
 	}
 
 	var identity Identity

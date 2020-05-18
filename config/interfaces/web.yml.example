@@ -17,3 +17,12 @@
   method: GET
 - path: /api/web/user/wechat/callback
   method: GET
+
+## recharge wechat
+- path: /api/web/recharge/wechat
+  method: POST
+  auth: true
+- path: /api/web/v1/recharge/wechat/verify
+  method: GET
+- path: /api/web/v1/recharge/wechat/verify
+  method: POST

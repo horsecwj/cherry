@@ -19,7 +19,7 @@ func GetUsersWechatLogin(context echo.Context) error {
 	values := urlStruct.Query()
 	values.Add("appid", envConfig.CurrentEnv.Wechat["app_id"])
 	values.Add("scope", envConfig.CurrentEnv.Wechat["snsapi_login"])
-	values.Add("redirect_uri", "https://"+context.Request().Host+envConfig.CurrentEnv.Wechat["callback_url"]+"?source=wechat")
+	values.Add("redirect_uri", "https://"+context.Request().Host+envConfig.CurrentEnv.Wechat["redirect_url_path"]+"?source=wechat")
 	urlStruct.RawQuery = values.Encode()
 	return context.Redirect(http.StatusPermanentRedirect, urlStruct.String())
 }

@@ -1,20 +1,30 @@
 package initializers
 
-// import (
-//   "encoding/base64"
-//   "io/ioutil"
-//   "log"
-//   "math/rand"
-//   "path/filepath"
-//
-//   "github.com/objcoding/wxpay"
-// )
-//
-// func InitWcpay() {
-//   account := wxpay.NewAccount(CurrentEnv.Wechat["appid"], CurrentEnv.Wechat["mch_id"], CurrentEnv.Wechat["key"], false)
-//   client := wxpay.NewClient(account)
-//   account.SetCertData("config/pems/apiclient_cert.p12")
-//   client.setAccount(account)
-//   client.SetHttpConnectTimeoutMs(2000)
-//   client.SetHttpReadTimeoutMs(1000)
-// }
+import (
+	"github.com/objcoding/wxpay"
+
+	"cherry/config"
+)
+
+var (
+	WxpayAccount *wxpay.Account
+	WxpayClient  *wxpay.Client
+)
+
+func InitAllPayments() {
+	InitWcpay()
+}
+
+func InitWcpay() {
+	WxpayAccount = wxpay.NewAccount(
+		config.CurrentEnv.Wechat["appid"],
+		config.CurrentEnv.Wechat["mch_id"],
+		config.CurrentEnv.Wechat["key"],
+		false,
+	)
+	WxpayClient = wxpay.NewClient(WxpayAccount)
+	WxpayAccount.SetCertData("config/pems/apiclient_cert.p12")
+	// WxpayClient.setAccount(WxpayAccount)
+	WxpayClient.SetHttpConnectTimeoutMs(2000)
+	WxpayClient.SetHttpReadTimeoutMs(1000)
+}
