@@ -15,6 +15,7 @@ require (
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/google/gofuzz v1.1.0 // indirect
 	github.com/gorilla/sessions v1.2.0 // indirect
+	github.com/gorilla/websocket v1.4.1
 	github.com/gosimple/slug v1.9.0 // indirect
 	github.com/hgfischer/go-otp v1.0.0
 	github.com/jinzhu/gorm v1.9.12
@@ -28,6 +29,7 @@ require (
 	github.com/micro/go-micro/v2 v2.2.0 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.2 // indirect
 	github.com/newrelic/go-agent v3.3.0+incompatible // indirect
+	github.com/objcoding/wxpay v1.0.6
 	github.com/oldfritter/echo-middleware v0.0.0-20191231015931-95c31010b17d
 	github.com/oldfritter/sneaker-go v1.0.6
 	github.com/qiniu/api.v7 v7.2.5+incompatible

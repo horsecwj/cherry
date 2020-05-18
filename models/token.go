@@ -9,6 +9,7 @@ import (
 
 type Token struct {
 	CommonModel
+	Type         string    `gorm:"type:varchar(32)" json:"type"`  // 令牌类型 Tokens::Login, Tokens::AccessToken
 	Token        string    `gorm:"type:varchar(64)" json:"token"` // 授权令牌
 	UserId       int       `json:"user_id"`                       // 所属用户
 	IsUsed       bool      `json:"is_used"`                       // 是否已使用
@@ -24,12 +25,12 @@ type TokenAndApp struct {
 
 func (token *Token) InitializeLoginToken() {
 	token.Token = utils.RandStringRunes(64)
+	token.Type = "Tokens::Login"
 	token.ExpireAt = time.Now().Add(time.Hour * 24 * 7)
 }
 
 func (token *Token) BeforeCreate(db *gorm.DB) {
-	var count int
-	db.Model(&Token{}).Where("token = ?", token.Token).Count(&count)
+	count := 9
 	for count > 0 {
 		token.Token = utils.RandStringRunes(64)
 		db.Model(&Token{}).Where("token = ?", token.Token).Count(&count)
@@ -38,5 +39,6 @@ func (token *Token) BeforeCreate(db *gorm.DB) {
 
 func (token *Token) InitializeAccessToken() {
 	token.Token = utils.RandStringRunes(64)
+	token.Type = "Tokens::AccessToken"
 	token.ExpireAt = time.Now().Add(time.Hour * 24 * 7)
 }

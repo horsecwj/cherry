@@ -6,12 +6,12 @@ import (
 
 type Service struct {
 	CommonModel
-	UserId    int    `json:"user_id"`
+	UserId      int    `json:"user_id"`
 	Inside      bool   `json:"inside"`
 	Name        string `json:"name"`
 	AppKey      string `json:"-"`
 	AppSecret   string `json:"-"`
-	AasmState   string `json:"-" gorm:"default:pending"`
+	AasmState   string `json:"-" gorm:"type:varchar(32);default:'pending'"`
 	CompanyName string `json:"company_name"`
 	CustomKey   string `json:"-" gorm:"type:text"`
 	PrivateKey  string `json:"-" gorm:"type:text"`

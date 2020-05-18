@@ -10,6 +10,6 @@ type AccountVersionCheckPoint struct {
 	UserId           int             `json:"user_id"`
 	AccountId        int             `json:"account_id"`
 	Fixed            string          `json:"fixed"`
-	FixedNum         decimal.Decimal `json:"fixed_num" gorm:"type:decimal(32,16)"`
-	Balance          decimal.Decimal `json:"balance" gorm:"type:decimal(32,16)"`
+	FixedNum         decimal.Decimal `json:"fixed_num" gorm:"type:decimal(32,2)"`
+	Balance          decimal.Decimal `json:"balance" gorm:"type:decimal(32,2)"`
 }

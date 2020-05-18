@@ -1,6 +1,7 @@
 cmd/*
 config/*.yml
-pems/*.pem
+config/pems/*.pem
+config/pems/*.p12
 logs/*.log
 vendor/
 Godeps/

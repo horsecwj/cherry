@@ -48,6 +48,8 @@ func main() {
 	e.Use(initializers.Auth)
 	routes.SetWebInterfaces(e)
 	routes.SetOauthInterfaces(e)
+	routes.SetWsInterfaces(e)
+
 	e.HTTPErrorHandler = customHTTPErrorHandler
 	t := &Template{
 		templates: template.Must(template.ParseGlob("public/api/*/*.html")),

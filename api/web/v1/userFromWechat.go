@@ -81,7 +81,7 @@ func UsersWechatCallback(context echo.Context) error {
 			Source:      "Wechat",
 			Symbol:      openid,
 			AccessToken: accessToken,
-			ExpireAt:    time.Now().Add(time.Hour * 24 * 7),
+			ExpiredAt:   time.Now().Add(time.Hour * 24 * 7),
 		}
 	} else {
 		identity.AccessToken = accessToken
@@ -90,7 +90,7 @@ func UsersWechatCallback(context echo.Context) error {
 		} else {
 			mainDB.Where("id = ?", identity.UserId).First(&user)
 		}
-		identity.ExpireAt = time.Now().Add(time.Hour * 24 * 7)
+		identity.ExpiredAt = time.Now().Add(time.Hour * 24 * 7)
 	}
 	user.Nickname = infoBody["display_name"]
 	if user.Nickname == "" {

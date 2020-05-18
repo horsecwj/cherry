@@ -6,6 +6,10 @@ import (
 	"cherry/utils"
 )
 
+const (
+	NotifyAccountWithRedis = "notify:account"
+)
+
 var (
 	UNKNOWN              = 0   // 未知类型
 	FIX                  = 1   // 修复
@@ -79,6 +83,13 @@ func AutoMigrations() {
 	// identity
 	mainDB.AutoMigrate(&Identity{})
 	mainDB.Model(&Identity{}).AddUniqueIndex("index_identity_on_source_and_symbol", "source", "symbol")
+
+	// recharge
+	mainDB.AutoMigrate(&Recharge{})
+	mainDB.Model(&Recharge{}).AddUniqueIndex("index_recharges_on_sn", "sn")
+
+	// service
+	mainDB.AutoMigrate(&Service{})
 
 	// token
 	mainDB.AutoMigrate(&Token{})

@@ -13,7 +13,7 @@ type Transfer struct {
 	Grant      bool            `json:"grant" gorm:"default:false"`
 	Sn         string          `json:"sn" gorm:"size:32"`
 	State      string          `json:"state" gorm:"default:'pending';size:12"`
-	Amount     decimal.Decimal `json:"amount" gorm:"type:decimal(32,16);default:null;"`
+	Amount     decimal.Decimal `json:"amount" gorm:"type:decimal(32,2);default:null;"`
 }
 
 func (transfer *Transfer) IsDone() bool {
