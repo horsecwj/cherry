@@ -13,9 +13,9 @@ type Service struct {
 	AppSecret   string `json:"-"`
 	AasmState   string `json:"-" gorm:"type:varchar(32);default:'pending'"`
 	CompanyName string `json:"company_name"`
-	CustomKey   string `json:"-" gorm:"type:text"`
+	CustomKey   string `json:"custom_key" gorm:"type:text"`
 	PrivateKey  string `json:"-" gorm:"type:text"`
-	PublicKey   string `json:"-" gorm:"type:text"`
+	PublicKey   string `json:"public_key" gorm:"type:text"`
 	Hosts       string `json:"-" gorm:"type:text"`
 	GrantUrl    string `json:"-"`
 
