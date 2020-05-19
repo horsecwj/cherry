@@ -60,7 +60,7 @@ func PostGrantCreate(context echo.Context) error {
 		"from":       strconv.Itoa(transfer.From),
 		"to":         strconv.Itoa(transfer.To),
 		"amount":     transfer.Amount.String(),
-		"currency":   currency.Code,
+		"currency":   currency.Key,
 		"service_id": strconv.Itoa(service.Id),
 		"notify_url": service.GrantUrl,
 		"timestamp":  strconv.Itoa(int(time.Now().Unix())),
