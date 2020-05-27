@@ -13,11 +13,8 @@ import (
 	"cherry/utils"
 )
 
-var (
-	upgrader = websocket.Upgrader{}
-)
-
 func Accounts(echoContext echo.Context) (err error) {
+	upgrader := websocket.Upgrader{}
 	user := echoContext.Get("current_user").(User)
 	c, err := upgrader.Upgrade(echoContext.Response(), echoContext.Request(), nil)
 	if err != nil {

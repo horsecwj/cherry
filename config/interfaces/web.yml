@@ -12,6 +12,11 @@
 - path: /api/web/grant/confirm
   method: POST
 
+## user
+- path: /api/web/user/accounts
+  method: GET
+  auth: true
+
 ## Wechat user
 - path: /api/web/user/wechat/login
   method: GET

@@ -9,6 +9,8 @@ func SetWebInterfaces(e *echo.Echo) {
 
 	e.GET("/api/web/currencies", v1.Currencies)
 
+	e.GET("/api/web/user/accounts", v1.UserAccounts)
+
 	e.POST("/api/web/grant/create", v1.PostGrantCreate)
 	e.GET("/api/web/grant/confirm", v1.GrantConfirm)
 	e.POST("/api/web/grant/confirm", v1.GrantConfirm)
