@@ -1,13 +1,8 @@
 package initializers
 
 import (
-	"crypto/hmac"
-	"crypto/sha256"
 	"encoding/base64"
-	"fmt"
-	"net/url"
 	"regexp"
-	"sort"
 	"strconv"
 	"time"
 
@@ -19,51 +14,6 @@ import (
 	. "cherry/models"
 	"cherry/utils"
 )
-
-func checkSign(context echo.Context, token *Token, params *map[string]string) bool {
-	sign := context.Request().Header.Get("Sign")
-	(*params)["tonce"] = context.Request().Header.Get("Tonce")
-	targetStr := context.Request().Method + "|" + context.Path() + "|"
-
-	keys := make([]string, len(*params))
-	i := 0
-	for k, _ := range *params {
-		keys[i] = k
-		i++
-	}
-	sort.Strings(keys)
-	for i, key := range keys {
-		if i > 0 {
-			targetStr += "&"
-		}
-		targetStr += key + "=" + url.QueryEscape((*params)[key])
-	}
-	token.InitializeTimestamp()
-	mac := hmac.New(sha256.New, []byte(token.ExpireAt.Format("2006-01-02 15:04:05")))
-	mac.Write([]byte(targetStr))
-	return sign == fmt.Sprintf("%x", mac.Sum(nil))
-}
-
-func OauthSign(method, path string, service *Service, params *map[string]string) string {
-	targetStr := method + "|" + path + "|"
-	var keys []string
-	for k, _ := range *params {
-		if k == "signature" {
-			continue
-		}
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-	for i, key := range keys {
-		if i > 0 {
-			targetStr += "&"
-		}
-		targetStr += key + "=" + url.QueryEscape((*params)[key])
-	}
-	mac := hmac.New(sha256.New, []byte(service.AppSecret))
-	mac.Write([]byte(targetStr))
-	return fmt.Sprintf("%x", mac.Sum(nil))
-}
 
 func LimitTrafficWithIp(context echo.Context) bool {
 	dataRedis := utils.GetRedisConn("data")

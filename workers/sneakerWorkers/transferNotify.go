@@ -44,11 +44,7 @@ func (worker Worker) TransferNotifyWorker(payloadJson *[]byte) (err error) {
 		values.Add(k, v)
 	}
 	var signature string
-	if service.CustomKey == "" {
-		signature = initializers.OauthSign("POST", urlStruct.Path, &service, &payload)
-	} else {
-		signature, _ = initializers.PrivateKeySign("POST", urlStruct.Path, &service, &payload)
-	}
+	signature, _ = initializers.PrivateKeySign("POST", urlStruct.Path, &service, &payload)
 	values.Add("signature", signature)
 	ctx, cancelFun := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancelFun()

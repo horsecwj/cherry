@@ -2,6 +2,8 @@ package models
 
 import (
 	"encoding/json"
+
+	"cherry/utils"
 )
 
 type Service struct {
@@ -9,8 +11,7 @@ type Service struct {
 	UserId      int    `json:"-"`
 	Inside      bool   `json:"-"`
 	Name        string `json:"name"`
-	AppKey      string `json:"-"`
-	AppSecret   string `json:"-"`
+	AppKey      string `json:"-" gorm:"type:varchar(64)"`
 	AasmState   string `json:"-" gorm:"type:varchar(32);default:'pending'"`
 	CompanyName string `json:"company_name"`
 	CustomKey   string `json:"custom_key" gorm:"type:text"`
@@ -20,6 +21,12 @@ type Service struct {
 	GrantUrl    string `json:"-"`
 
 	CallbackHosts []string `json:"callback_hosts" sql:"-"`
+}
+
+func (as *Service) BeforeCreate() {
+	if as.AppKey == "" {
+		as.AppKey = utils.RandStringRunes(64)
+	}
 }
 
 func (as *Service) AfterFind() {
@@ -37,7 +44,7 @@ func (as *Service) ValidataHost(host string) (re bool) {
 }
 
 func (as *Service) CanNotGrant() (canNot bool) {
-	if as.GrantUrl != "" {
+	if as.GrantUrl != "" || as.Inside == false {
 		canNot = true
 	}
 	return
