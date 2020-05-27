@@ -15,7 +15,7 @@ require (
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/google/gofuzz v1.1.0 // indirect
 	github.com/gorilla/sessions v1.2.0 // indirect
-	github.com/gorilla/websocket v1.4.1
+	github.com/gorilla/websocket v1.4.2
 	github.com/gosimple/slug v1.9.0 // indirect
 	github.com/hgfischer/go-otp v1.0.0
 	github.com/jinzhu/gorm v1.9.12
@@ -47,6 +47,7 @@ require (
 	github.com/robfig/cron v1.2.0
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/shopspring/decimal v0.0.0-20200105231215-408a2507e114
+	github.com/spf13/viper v1.7.0
 	github.com/streadway/amqp v0.0.0-20200108173154-1c71cc93ed71
 	github.com/stretchr/testify v1.5.1 // indirect
 	github.com/swaggo/echo-swagger v0.0.0-20191205130555-62f81ea88919 // indirect

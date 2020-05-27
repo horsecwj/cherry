@@ -17,6 +17,8 @@ func (worker Worker) GrantCancelWorker(payloadJson *[]byte) (err error) {
 	mainDB.Where("id = ?", payload["transfer_id"]).First(&transfer)
 	if transfer.IsGranting() {
 		transfer.State = "canceled"
+	} else if transfer.IsDone() {
+		return
 	} else {
 		worker.LogError("transfer type is error, transfer id: ", payload["transfer_id"])
 	}

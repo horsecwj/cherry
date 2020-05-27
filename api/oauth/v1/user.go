@@ -184,6 +184,8 @@ func GetOauthUserInfo(context echo.Context) error {
 		Sn:           user.Sn,
 		Name:         user.Nickname,
 		Ancestry:     user.Ancestry,
+		Role:         user.Role.Name,
+		InviteUrl:    "https://", // TODO: 邀请链接
 		Activated:    user.Activated,
 		SmsValidated: user.SmsValidated,
 	}

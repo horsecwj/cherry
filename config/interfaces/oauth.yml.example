@@ -1,5 +1,9 @@
 ---
 # OAuth --------------------------------------------------------------------------------------
+## service
+- path: /oauth/services
+  method: GET
+
 ## tools
 - path: /oauth/email
   method: POST

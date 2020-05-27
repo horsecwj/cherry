@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
-	"time"
 
 	"github.com/labstack/echo"
 	"github.com/shopspring/decimal"
@@ -22,14 +21,14 @@ var transferNotifyRoutingKey string
 
 func GetTransfer(context echo.Context) error {
 	params := context.Get("params").(map[string]string)
-	mainDb := utils.MainDbBegin()
-	defer mainDb.DbRollback()
+	mainDB := utils.MainDbBegin()
+	defer mainDB.DbRollback()
 	var service Service
-	if mainDb.Where("app_key = ?", params["app_key"]).First(&service).RecordNotFound() {
+	if mainDB.Where("app_key = ?", params["app_key"]).First(&service).RecordNotFound() {
 		return utils.BuildError("1102")
 	}
 	var transfer Transfer
-	if mainDb.Where("sn = ? AND service_id = ?", params["sn"], service.Id).First(&transfer).RecordNotFound() {
+	if mainDB.Where("sn = ? AND service_id = ?", params["sn"], service.Id).First(&transfer).RecordNotFound() {
 		return utils.BuildError("1113")
 	}
 	response := utils.SuccessResponse
@@ -55,11 +54,11 @@ func PostTransfersCreate(context echo.Context) error {
 		return utils.BuildError("1105")
 	}
 
-	mainDb := utils.MainDbBegin()
-	defer mainDb.DbRollback()
+	mainDB := utils.MainDbBegin()
+	defer mainDB.DbRollback()
 
 	var currency Currency
-	if mainDb.Where("code = ?", params["currency"]).First(&currency).RecordNotFound() {
+	if mainDB.Where("code = ?", params["currency"]).First(&currency).RecordNotFound() {
 		return utils.BuildError("1107")
 	}
 
@@ -72,23 +71,21 @@ func PostTransfersCreate(context echo.Context) error {
 		Sn:         params["sn"],
 		State:      "pending",
 	}
-	if !mainDb.Where("service_id = ?", service.Id).Where("sn = ?", params["sn"]).Find(&Transfer{}).RecordNotFound() {
+	if !mainDB.Where("service_id = ?", service.Id).Where("sn = ?", params["sn"]).Find(&Transfer{}).RecordNotFound() {
 		return utils.BuildError("1114")
 	}
-	mainDb.DbRollback()
+	mainDB.DbRollback()
 	err := transferToChangeAccount(&transfer, 9)
 	if err == nil {
 		transfer.InitializeTimestamp()
 		sendMessageToNotifyUrl(params["notify_url"], &map[string]string{
-			"id":           strconv.Itoa(transfer.Id),
-			"from":         strconv.Itoa(transfer.From),
-			"to":           strconv.Itoa(transfer.To),
-			"amount":       transfer.Amount.String(),
-			"currency":     currency.Key,
-			"service_id":   strconv.Itoa(service.Id),
-			"sn":           params["sn"],
-			"notify_times": "1",
-			"timestamp":    strconv.Itoa(int(time.Now().Unix())),
+			"id":         strconv.Itoa(transfer.Id),
+			"from":       strconv.Itoa(transfer.From),
+			"to":         strconv.Itoa(transfer.To),
+			"amount":     transfer.Amount.String(),
+			"currency":   currency.Key,
+			"service_id": strconv.Itoa(service.Id),
+			"sn":         params["sn"],
 		})
 		response := utils.SuccessResponse
 		return context.JSON(http.StatusOK, response)
@@ -111,10 +108,10 @@ func PostTransfersBack(context echo.Context) error {
 		return utils.BuildError("1105")
 	}
 
-	mainDb := utils.MainDbBegin()
-	defer mainDb.DbRollback()
+	mainDB := utils.MainDbBegin()
+	defer mainDB.DbRollback()
 	var currency Currency
-	if mainDb.Where("code = ?", params["currency"]).First(&currency).RecordNotFound() {
+	if mainDB.Where("code = ?", params["currency"]).First(&currency).RecordNotFound() {
 		return utils.BuildError("1107")
 	}
 
@@ -127,23 +124,21 @@ func PostTransfersBack(context echo.Context) error {
 		Sn:         params["sn"],
 		State:      "pending",
 	}
-	if !mainDb.Where("service_id = ?", service.Id).Where("sn = ?", params["sn"]).Find(&Transfer{}).RecordNotFound() {
+	if !mainDB.Where("service_id = ?", service.Id).Where("sn = ?", params["sn"]).Find(&Transfer{}).RecordNotFound() {
 		return utils.BuildError("1114")
 	}
-	mainDb.DbRollback()
+	mainDB.DbRollback()
 	err := transferToChangeAccount(&transfer, 3)
 	if err == nil {
 		transfer.InitializeTimestamp()
 		sendMessageToNotifyUrl(params["notify_url"], &map[string]string{
-			"id":           strconv.Itoa(transfer.Id),
-			"from":         strconv.Itoa(transfer.From),
-			"to":           strconv.Itoa(transfer.To),
-			"amount":       transfer.Amount.String(),
-			"currency":     currency.Key,
-			"service_id":   strconv.Itoa(service.Id),
-			"sn":           params["sn"],
-			"notify_times": "1",
-			"timestamp":    strconv.Itoa(int(time.Now().Unix())),
+			"id":         strconv.Itoa(transfer.Id),
+			"from":       strconv.Itoa(transfer.From),
+			"to":         strconv.Itoa(transfer.To),
+			"amount":     transfer.Amount.String(),
+			"currency":   currency.Key,
+			"service_id": strconv.Itoa(service.Id),
+			"sn":         params["sn"],
 		})
 		response := utils.SuccessResponse
 		return context.JSON(http.StatusOK, response)
@@ -153,42 +148,42 @@ func PostTransfersBack(context echo.Context) error {
 }
 
 func transferToChangeAccount(transfer *Transfer, times int) error {
-	mainDb := utils.MainDbBegin()
-	defer mainDb.DbRollback()
+	mainDB := utils.MainDbBegin()
+	defer mainDB.DbRollback()
 	var fromAccount, toAccount Account
-	if mainDb.Where("user_id = ?", (*transfer).From).Where("currency = ?", (*transfer).CurrencyId).First(&fromAccount).RecordNotFound() {
+	if mainDB.Where("user_id = ?", (*transfer).From).Where("currency = ?", (*transfer).CurrencyId).First(&fromAccount).RecordNotFound() {
 		fromAccount.UserId = transfer.From
 		fromAccount.CurrencyId = transfer.CurrencyId
 		fromAccount.Balance = decimal.Zero
 		fromAccount.Locked = decimal.Zero
-		mainDb.Save(&fromAccount)
-		mainDb.DbCommit()
+		mainDB.Save(&fromAccount)
+		mainDB.DbCommit()
 		return utils.BuildError("1103")
 	}
-	if mainDb.Where("user_id = ?", (*transfer).To).Where("currency = ?", (*transfer).CurrencyId).First(&toAccount).RecordNotFound() {
+	if mainDB.Where("user_id = ?", (*transfer).To).Where("currency = ?", (*transfer).CurrencyId).First(&toAccount).RecordNotFound() {
 		toAccount.UserId = transfer.To
 		toAccount.CurrencyId = transfer.CurrencyId
 		toAccount.Balance = decimal.Zero
 		toAccount.Locked = decimal.Zero
-		mainDb.Save(&toAccount)
+		mainDB.Save(&toAccount)
 	}
 
 	if fromAccount.Balance.Sub(transfer.Amount).IsNegative() {
 		return utils.BuildError("1103")
 	}
 	transfer.State = "done"
-	mainDb.Create(transfer)
+	mainDB.Create(transfer)
 	if transfer.Id == 0 {
 		return utils.BuildError("1112")
 	}
-	err1 := fromAccount.SubFunds(mainDb, (*transfer).Amount, decimal.Zero, TRANSFER_BACK, (*transfer).Id, "Transfer")
-	err2 := toAccount.PlusFunds(mainDb, (*transfer).Amount, decimal.Zero, TRANSFER, (*transfer).Id, "Transfer")
+	err1 := fromAccount.SubFunds(mainDB, (*transfer).Amount, decimal.Zero, TRANSFER_BACK, (*transfer).Id, "Transfer")
+	err2 := toAccount.PlusFunds(mainDB, (*transfer).Amount, decimal.Zero, TRANSFER, (*transfer).Id, "Transfer")
 
 	if err1 == nil && err2 == nil {
-		mainDb.DbCommit()
+		mainDB.DbCommit()
 		return nil
 	}
-	mainDb.DbRollback()
+	mainDB.DbRollback()
 	if times > 0 {
 		(*transfer).Id = 0
 		return transferToChangeAccount(transfer, times-1)

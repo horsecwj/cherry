@@ -37,6 +37,7 @@ var (
 	Done     = 20
 
 	AllCurrencies []Currency
+	AllRoles      []Role
 )
 
 type CommonModel struct {
@@ -88,6 +89,9 @@ func AutoMigrations() {
 	// recharge
 	mainDB.AutoMigrate(&Recharge{})
 	mainDB.Model(&Recharge{}).AddUniqueIndex("index_recharges_on_sn", "sn")
+
+	// role
+	mainDB.AutoMigrate(&Role{})
 
 	// service
 	mainDB.AutoMigrate(&Service{})

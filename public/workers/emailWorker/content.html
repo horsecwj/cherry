@@ -1,16 +1,17 @@
-{{ define "layout_email_content" }}
-
 {{ template "layout_email_head" .}}
 <div class="body">
-    {{ if ne hi "" }}
-        <h1 class="title">{{ hi }}</h1>
-            <br>
+
+    {{ if ne title "" }}
+        <h1 class="title">{{ title }}</h1>
+        <br>
     {{ end }}
-    {{ if ne follow_token "" }}
-        <h1 class="content">{{ follow_token }}</h1>
+
+    {{ if ne content "" }}
+        <h1 class="content">{{ content }}</h1>
     {{ end }}
+
     <p class="thanks">Thanks,</p>
-    <p class="team">Rfinex Team</p>
+    <p class="team">WatBTC Team</p>
+
 </div>
 {{ template "layout_email_footer" .}}
-{{end}}

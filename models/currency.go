@@ -20,6 +20,7 @@ type Currency struct {
 }
 
 func InitAllCurrencies(db *utils.GormDB) {
+	db.FirstOrCreate(&Currency{}, map[string]interface{}{"symbol": "cny", "key": "CNY", "visible": true})
 	db.Where("visible = ?", true).Find(&AllCurrencies)
 }
 

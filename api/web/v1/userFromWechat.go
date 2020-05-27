@@ -103,7 +103,7 @@ func UsersWechatCallback(context echo.Context) error {
 	mainDB.Save(&identity)
 	var token Token
 	token.UserId = user.Id
-	token.InitializeLoginToken()
+	token.InitializeAccessToken()
 	mainDB.Create(&token)
 	mainDB.Where("user_id = ?", user.Id).Where("expire_at > ?", time.Now()).First(&user.Tokens)
 	mainDB.DbCommit()

@@ -126,7 +126,7 @@ func normalAuth(context echo.Context, params *map[string]string, db *utils.GormD
 	if tokenStr == "" {
 		tokenStr = context.Request().Header.Get("Authorization")
 	}
-	if db.Where("`type` = ?", "Token").Where("token = ? AND ? < expire_at", tokenStr, time.Now()).First(&token).RecordNotFound() {
+	if db.Where("`type` = ?", "AccessToken").Where("token = ? AND ? < expire_at", tokenStr, time.Now()).First(&token).RecordNotFound() {
 		return user, token, utils.BuildError("4016")
 	}
 	if db.Where("id = ?", token.UserId).First(&user).RecordNotFound() {

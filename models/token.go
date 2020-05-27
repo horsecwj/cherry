@@ -23,12 +23,6 @@ type TokenAndApp struct {
 	ServiceId int
 }
 
-func (token *Token) InitializeLoginToken() {
-	token.Token = utils.RandStringRunes(64)
-	token.Type = "Tokens::Login"
-	token.ExpireAt = time.Now().Add(time.Hour * 24 * 7)
-}
-
 func (token *Token) BeforeCreate(db *gorm.DB) {
 	count := 9
 	for count > 0 {
@@ -39,6 +33,6 @@ func (token *Token) BeforeCreate(db *gorm.DB) {
 
 func (token *Token) InitializeAccessToken() {
 	token.Token = utils.RandStringRunes(64)
-	token.Type = "Tokens::AccessToken"
+	token.Type = "AccessToken"
 	token.ExpireAt = time.Now().Add(time.Hour * 24 * 7)
 }

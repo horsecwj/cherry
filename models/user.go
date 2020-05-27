@@ -9,6 +9,7 @@ import (
 
 type User struct {
 	CommonModel
+	RoleId         int    `json:"role_id"`                          // 角色
 	Sn             string `gorm:"type:varchar(16)" json:"sn"`       // 唯一编号
 	PasswordDigest string `gorm:"type:varchar(64)" json:"-"`        // 经加密的密码
 	Nickname       string `gorm:"type:varchar(32)" json:"nickname"` // 昵称
@@ -21,17 +22,18 @@ type User struct {
 	SmsValidated bool    `sql:"-" json:"sms_validated"`
 	Password     string  `sql:"-" json:"-"`
 	Tokens       []Token `sql:"-" json:"tokens"`
+	Role         Role    `sql:"-" json:"role"`
 }
 
 type OauthUserInfo struct {
-	Uid       int    `json:"uid"`
-	Sn        string `json:"sn"`
-	Name      string `json:"name"`
-	Ancestry  string `json:"ancestry"`
-	InviteUrl string `json:"invite_url"`
-
-	Activated    bool `json:"activated"`
-	SmsValidated bool `json:"sms_validated"`
+	Uid          int    `json:"uid"`
+	Sn           string `json:"sn"`
+	Name         string `json:"name"`
+	Ancestry     string `json:"ancestry"`
+	InviteUrl    string `json:"invite_url"`
+	Role         string `json:"role"`
+	Activated    bool   `json:"activated"`
+	SmsValidated bool   `json:"sms_validated"`
 }
 
 func (user *User) BeforeCreate(db *gorm.DB) {
@@ -43,6 +45,7 @@ func (user *User) BeforeCreate(db *gorm.DB) {
 }
 
 func (user *User) AfterFind(db *gorm.DB) {
+	user.setRole()
 }
 
 func (user *User) CompareHashAndPassword() bool {
@@ -56,4 +59,16 @@ func (user *User) CompareHashAndPassword() bool {
 func (user *User) SetPasswordDigest() {
 	b, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	user.PasswordDigest = string(b[:])
+}
+
+func (user *User) setRole() {
+	for _, role := range AllRoles {
+		if user.RoleId == 0 && role.Name == "Guest" {
+			user.Role = role
+			return
+		} else if user.RoleId == role.Id {
+			user.Role = role
+			return
+		}
+	}
 }

@@ -18,6 +18,7 @@ func InitCacheData() {
 	db := utils.MainDbBegin()
 	defer db.DbRollback()
 	InitAllCurrencies(db)
+	InitAllRoles(db)
 	InitConfigInDB(db)
 }
 
@@ -54,6 +55,12 @@ func (payload *Payload) Currencies() {
 	db := utils.MainDbBegin()
 	defer db.DbRollback()
 	InitAllCurrencies(db)
+}
+
+func (payload *Payload) Roles() {
+	db := utils.MainDbBegin()
+	defer db.DbRollback()
+	InitAllRoles(db)
 }
 
 func (payload *Payload) Configs() {

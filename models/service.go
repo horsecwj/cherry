@@ -6,8 +6,8 @@ import (
 
 type Service struct {
 	CommonModel
-	UserId      int    `json:"user_id"`
-	Inside      bool   `json:"inside"`
+	UserId      int    `json:"-"`
+	Inside      bool   `json:"-"`
 	Name        string `json:"name"`
 	AppKey      string `json:"-"`
 	AppSecret   string `json:"-"`
@@ -19,15 +19,15 @@ type Service struct {
 	Hosts       string `json:"-" gorm:"type:text"`
 	GrantUrl    string `json:"-"`
 
-	CallBackHosts []string `sql:"-"`
+	CallbackHosts []string `json:"callback_hosts" sql:"-"`
 }
 
 func (as *Service) AfterFind() {
-	json.Unmarshal([]byte(as.Hosts), &as.CallBackHosts)
+	json.Unmarshal([]byte(as.Hosts), &as.CallbackHosts)
 }
 
 func (as *Service) ValidataHost(host string) (re bool) {
-	for _, h := range as.CallBackHosts {
+	for _, h := range as.CallbackHosts {
 		if h == host {
 			re = true
 			return
