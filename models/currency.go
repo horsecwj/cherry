@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"cherry/utils"
 	"github.com/jinzhu/gorm"
+
+	"cherry/utils"
 )
 
 type Currency struct {

@@ -20,6 +20,7 @@ func InitCacheData() {
 	InitAllCurrencies(db)
 	InitAllRoles(db)
 	InitConfigInDB(db)
+	db.DbCommit()
 }
 
 func LoadCacheData() {
