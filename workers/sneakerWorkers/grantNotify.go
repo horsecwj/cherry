@@ -35,6 +35,7 @@ func (worker Worker) GrantNotifyWorker(payloadJson *[]byte) (err error) {
 	}
 	mainDB.Save(&transfer)
 	mainDB.DbCommit()
+
 	urlStruct, _ := url.Parse(service.GrantUrl)
 	values := urlStruct.Query()
 	for k, _ := range values {
@@ -59,12 +60,12 @@ func (worker Worker) GrantNotifyWorker(payloadJson *[]byte) (err error) {
 		worker.LogInfo(err.Error())
 		return
 	}
-	mainDB = utils.MainDbBegin()
-	defer mainDB.DbRollback()
+	db := utils.MainDbBegin()
+	defer db.DbRollback()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil || strings.ToLower(string(body)) != "success" {
 		worker.LogInfo(err.Error())
-		mainDB.Save(&TransferNotifyLog{
+		db.Save(&TransferNotifyLog{
 			TransferId:   transfer.Id,
 			RequestUrl:   service.GrantUrl,
 			RequestBody:  values.Encode(),
@@ -73,8 +74,8 @@ func (worker Worker) GrantNotifyWorker(payloadJson *[]byte) (err error) {
 		})
 	} else {
 		transfer.State = "done"
-		mainDB.Save(&transfer)
+		db.Save(&transfer)
 	}
-	mainDB.DbCommit()
+	db.DbCommit()
 	return
 }

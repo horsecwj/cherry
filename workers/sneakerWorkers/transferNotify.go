@@ -61,11 +61,11 @@ func (worker Worker) TransferNotifyWorker(payloadJson *[]byte) (err error) {
 		return
 	}
 	body, err := ioutil.ReadAll(resp.Body)
-	mainDB = utils.MainDbBegin()
-	defer mainDB.DbRollback()
+	db := utils.MainDbBegin()
+	defer db.DbRollback()
 	if err != nil || strings.ToLower(string(body)) != "success" {
 		worker.LogInfo(err.Error())
-		mainDB.Save(&TransferNotifyLog{
+		db.Save(&TransferNotifyLog{
 			TransferId:   transfer.Id,
 			RequestUrl:   payload["notify_url"],
 			RequestBody:  values.Encode(),
@@ -74,8 +74,8 @@ func (worker Worker) TransferNotifyWorker(payloadJson *[]byte) (err error) {
 		})
 	} else {
 		transfer.State = "done"
-		mainDB.Save(&transfer)
+		db.Save(&transfer)
 	}
-	mainDB.DbCommit()
+	db.DbCommit()
 	return
 }
