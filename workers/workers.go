@@ -1,16 +1,14 @@
 package main
 
 import (
-	"io/ioutil"
-	"log"
 	"os"
 	"os/signal"
-	"strconv"
 
 	sneaker "github.com/oldfritter/sneaker-go"
 	"github.com/streadway/amqp"
 
 	"cherry/initializers"
+	"cherry/utils"
 	"cherry/workers/sneakerWorkers"
 )
 
@@ -28,8 +26,7 @@ func main() {
 
 func initialize() {
 	initializers.InitializeAmqpConfig()
-	setLog()
-	setPid()
+	utils.SetLogAndPid("workers")
 }
 
 func closeResource() {
@@ -45,33 +42,5 @@ func StartAllWorkers() {
 				}(w)
 			}
 		}
-	}
-}
-
-func setLog() {
-	err := os.Mkdir("logs", 0755)
-	if err != nil {
-		if !os.IsExist(err) {
-			log.Fatalf("create folder error: %v", err)
-		}
-	}
-
-	file, err := os.OpenFile("logs/workers.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
-	if err != nil {
-		log.Fatalf("open file error: %v", err)
-	}
-	log.SetOutput(file)
-}
-
-func setPid() {
-	err := os.Mkdir("pids", 0755)
-	if err != nil {
-		if !os.IsExist(err) {
-			log.Fatalf("create folder error: %v", err)
-		}
-	}
-	err = ioutil.WriteFile("pids/workers.pid", []byte(strconv.Itoa(os.Getpid())), 0644)
-	if err != nil {
-		log.Fatalf("error: %v", err)
 	}
 }

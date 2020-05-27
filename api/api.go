@@ -5,12 +5,10 @@ import (
 	"fmt"
 	"html/template"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
-	"strconv"
 	"time"
 
 	"github.com/labstack/echo"
@@ -99,40 +97,11 @@ func initialize() {
 	initializers.LoadInterfaces()
 	initializers.LoadCacheData()
 	initializers.InitAllPayments()
-	setLog()
-	setPid()
+	utils.SetLogAndPid("api")
 }
 
 func closeResource() {
 	initializers.CloseAmqpConnection()
 	utils.CloseRedisPools()
 	utils.CloseMainDB()
-}
-
-func setLog() {
-	err := os.Mkdir("logs", 0755)
-	if err != nil {
-		if !os.IsExist(err) {
-			log.Fatalf("create folder error: %v", err)
-		}
-	}
-
-	file, err := os.OpenFile("logs/api.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
-	if err != nil {
-		log.Fatalf("open file error: %v", err)
-	}
-	log.SetOutput(file)
-}
-
-func setPid() {
-	err := os.Mkdir("pids", 0755)
-	if err != nil {
-		if !os.IsExist(err) {
-			log.Fatalf("create folder error: %v", err)
-		}
-	}
-	err = ioutil.WriteFile("pids/api.pid", []byte(strconv.Itoa(os.Getpid())), 0644)
-	if err != nil {
-		log.Fatalf("error: %v", err)
-	}
 }
