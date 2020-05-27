@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"time"
 
-	. "cherry/models"
+	. "cherry/mailer"
 	"cherry/utils"
 )
 
@@ -18,14 +18,14 @@ type Exception struct {
 
 func (worker Worker) EmailWorker(payloadJson *[]byte) (err error) {
 	start := time.Now().UnixNano()
-	var payload MailerPayload
+	var payload Payload
 	json.Unmarshal([]byte(*payloadJson), &payload)
 	exception := Exception{}
 	excute(start, &payload, &worker, &exception)
 	return
 }
 
-func excute(start int64, payload *MailerPayload, worker *Worker, exception *Exception) {
+func excute(start int64, payload *Payload, worker *Worker, exception *Exception) {
 	defer func(e *Exception) {
 		r := recover()
 		if r != nil {
