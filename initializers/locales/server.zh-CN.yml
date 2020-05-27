@@ -1,0 +1,36 @@
+# encoding: utf-8
+#
+# Never edit this file. It will be overwritten when translations are pulled from Transifex.
+#
+
+zh-CN:
+  mailer:
+    dear_user: 您好,
+    signature: Rfinex团队
+    please_contact: 如果此次登录不是您本人操作，请马上<a href="mailto:{{.contact_mail}}">联系我们</a>。
+    footer: "此邮件由系统自动发出，请勿直接回复。 有问题请<a href='mailto:{{.contact_mail}}'>联系我们</a>。"
+  token_mailer:
+    activation:
+      subject: "[Rfinex] 帐号激活"
+      title: '感谢您注册 Rfinex，赶快点击下面的链接验证您的E-mail吧：'
+      content: "如果链接无法点击，请完整拷贝到浏览器地址栏里直接访问。<br/><a href='{{.link}}'>{{.link}}</a><br/>链接30分钟之内有效"
+    app_reset_password:
+      subject: "{{.token}}Rfinex的验证码"
+      title: 尊敬的{{.email}}用户您好，您正在进行修改或者设置操作，请验证账户，完成修改或设置操作
+      content: "{{.token}} 是您的验证码"
+    set_fund_password:
+      subject: "{{.token}}Rfinex的验证码"
+      title: 尊敬的{{.email}}用户您好，您正在进行修改或者设置操作，请验证账户，完成修改或设置操作
+      content: "{{.token}} 是您的验证码"
+    bind_email:
+      subject: "{{.token}}Rfinex的验证码"
+      title: 尊敬的{{.email}}用户您好，您正在进行修改或者设置操作，请验证账户，完成修改或设置操作
+      content: "{{.token}}是您的验证码"
+    email_code_verified:
+      subject: "{{.token}} Rfinex的验证码"
+      title: 尊敬的{{.email}}用户您好，您正在进行修改或者设置操作，请验证账户，完成修改或设置操作
+      content: "{{.token}} 是您的验证码"
+    register_email_code_verified:
+      subject: "{{.token}} Rfinex的验证码"
+      title: 尊敬的{{.email}}用户您好，您正在进行注册操作，请验证账户，完成注册
+      content: "{{.token}} 是您的验证码"

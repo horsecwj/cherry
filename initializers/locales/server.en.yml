@@ -1,0 +1,31 @@
+en:
+  mailer:
+    dear_user: Dear user,
+    signature: Thanks,<br/>The Rfinex Team
+    please_contact: If it's not you, please <a href='mailto:{{.contact_mail}}'>contact us</a> ASAP.
+    footer: This is an automatically generated email, please do not reply, if you have any question, please <a href="mailto:{{.contact_mail}}">contact us</a>.
+  token_mailer:
+    activation:
+      subject: "[Rfinex] Account Activation"
+      title: 'Thank you for signing up on Rfinex, please follow this link to verify your Email:'
+      content: "Copy and open the link in your browser if you are unable to click and visit it.<br/><a href='{{.link}}'>{{.link}}</a><br/>The link expires in 30 minutes."
+    app_reset_password:
+      subject: "{{.token}}Your verification code "
+      title: Dear user{{.email}}, you are in the process of modifying or setting. Please verify your account and complete the modification or setting
+      content: "{{.token}} Your verification code "
+    set_fund_password:
+      subject: "{{.token}}Your verification code "
+      title: Dear user{{.email}}, you are in the process of modifying or setting. Please verify your account and complete the modification or setting
+      content: "{{.token}}Your verification code "
+    bind_email:
+      subject: "{{.token}}Your verification code "
+      title: Dear user{{.email}}, you are in the process of modifying or setting. Please verify your account and complete the modification or setting
+      content: "{{.token}}Your verification code "
+    email_code_verified:
+      subject: "{{.token}}Your verification code "
+      title: Dear user{{.email}}, you are in the process of modifying or setting. Please verify your account and complete the modification or setting
+      content: "{{.token}}Your verification code "
+    register_email_code_verified:
+      subject: "{{.token}}Your verification code "
+      title: Dear user {{.email}}, you merge the registration operation, please verify the account and complete the registration
+      content: "{{.token}} is your verification code"
