@@ -67,7 +67,7 @@ func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 			if context.Path() == apiInterface.Path && context.Request().Method == apiInterface.Method {
 				currentApiInterface = apiInterface
 				if currentApiInterface.LimitTrafficWithIp && LimitTrafficWithIp(context) != true {
-					return utils.BuildError("3043")
+					return utils.BuildError("1027")
 				}
 				if apiInterface.Auth != true {
 					return next(context)
