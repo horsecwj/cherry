@@ -77,60 +77,66 @@ func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 		if currentApiInterface.Path == "" {
 			return utils.BuildError("1025")
 		}
-		if context.Request().Header.Get("Authorization") == "" && context.QueryParam("token") == "" {
-			return utils.BuildError("2016")
+		if context.Request().Header.Get("Authorization") == "" {
+			if context.QueryParam("token") == "" {
+				return utils.BuildError("1026")
+			}
+		} else {
+			if params["token"] == "" {
+				params["token"] = context.Request().Header.Get("Authorization")
+			}
 		}
-		if currentApiInterface.CheckTimestamp && checkTimestamp(context, &params) == false {
-			return utils.BuildError("3050")
+		if currentApiInterface.CheckTimestamp && checkTimestamp(context, params) == false {
+			return utils.BuildError("1024")
 		}
-
+		if currentApiInterface.Sign && !checkSign(context, params) {
+			return utils.BuildError("1023")
+		}
 		db := utils.MainDbBegin()
 		defer db.DbRollback()
-
 		var user User
 		var err error
 		var matchedOauth bool
 		if matchedOauth, err = regexp.MatchString("^/oauth/", context.Path()); matchedOauth {
 			var token Token
-			user, token, err = oauthAuth(context, &params, db)
+			user, token, err = oauthAuth(context, params, db)
 			context.Set("current_token", token.Token)
 		} else {
 			var token Token
-			user, token, err = normalAuth(context, &params, db)
+			user, token, err = normalAuth(context, params, db)
 			context.Set("current_token", token.Token)
 		}
 		if err != nil {
 			log.Println("err: ", err)
 			return err
 		}
-
 		db.DbCommit()
 		context.Set("current_user", user)
 		return next(context)
 	}
 }
 
-func oauthAuth(context echo.Context, params *map[string]string, db *utils.GormDB) (user User, token Token, err error) {
-	tokenStr := (*params)["access_token"]
+func oauthAuth(context echo.Context, params map[string]string, db *utils.GormDB) (user User, token Token, err error) {
+	tokenStr := params["access_token"]
 	if db.Where("`type` = ?", "AccessToken").Where("token = ? AND ? < expire_at", tokenStr, time.Now()).First(&token).RecordNotFound() {
-		return user, token, utils.BuildError("4016")
+		return user, token, utils.BuildError("1101")
 	}
 	if db.Where("id = ?", token.UserId).First(&user).RecordNotFound() {
-		return user, token, utils.BuildError("4016")
+		err = utils.BuildError("1101")
 	}
 	return
 }
 
-func normalAuth(context echo.Context, params *map[string]string, db *utils.GormDB) (user User, token Token, err error) {
-	tokenStr := (*params)["token"]
+func normalAuth(context echo.Context, params map[string]string, db *utils.GormDB) (user User, token Token, err error) {
+	tokenStr := params["token"]
 	if tokenStr == "" {
 		tokenStr = context.Request().Header.Get("Authorization")
 	}
 	if db.Where("`type` = ?", "AccessToken").Where("token = ? AND ? < expire_at", tokenStr, time.Now()).First(&token).RecordNotFound() {
-		return user, token, utils.BuildError("4016")
+		return user, token, utils.BuildError("1101")
 	}
 	if db.Where("id = ?", token.UserId).First(&user).RecordNotFound() {
-		return user, token, utils.BuildError("4016")
+		err = utils.BuildError("1101")
 	}
 	return
 }

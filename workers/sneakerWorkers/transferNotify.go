@@ -43,8 +43,7 @@ func (worker Worker) TransferNotifyWorker(payloadJson *[]byte) (err error) {
 	for k, v := range payload {
 		values.Add(k, v)
 	}
-	var signature string
-	signature, _ = initializers.PrivateKeySign("POST", urlStruct.Path, &service, &payload)
+	signature, _ := initializers.PrivateKeySign("POST", urlStruct.Path, service.PrivateKey, payload)
 	values.Add("signature", signature)
 	ctx, cancelFun := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancelFun()

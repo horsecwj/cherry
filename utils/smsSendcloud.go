@@ -28,7 +28,7 @@ func SendSmsSendcloud(phone string, payloadJson *[]byte, templateId string) {
 	}
 	params := map[string]string{"smsUser": envConfig.CurrentEnv.Sms.SmsUser, "templateId": templateId, "msgType": msgType, "phone": phone, "vars": payload}
 	apiUrl := envConfig.CurrentEnv.Sms.ApiUrl
-	HandleRequest(&params, apiUrl)
+	HandleRequest(params, apiUrl)
 }
 
 // voice code
@@ -45,19 +45,19 @@ func SendSmsSendcloudVoice(phone string, payloadJson *[]byte) {
 	}
 	params := map[string]string{"smsUser": envConfig.CurrentEnv.Sms.SmsUser, "phone": phone, "code": payload.Code}
 	apiUrl := envConfig.CurrentEnv.Sms.VoiceApiUrl
-	HandleRequest(&params, apiUrl)
+	HandleRequest(params, apiUrl)
 }
 
 // Signature
-func SignatureSmsSendcloud(params *map[string]string) string {
+func SignatureSmsSendcloud(params map[string]string) string {
 	var keys []string
-	for k := range *params {
+	for k := range params {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
 	paramStr := ""
 	for _, k := range keys {
-		str := k + "=" + (*params)[k] + "&"
+		str := k + "=" + params[k] + "&"
 		paramStr += str
 	}
 	paramStr = envConfig.CurrentEnv.Sms.SmsKey + "&" + paramStr + envConfig.CurrentEnv.Sms.SmsKey
@@ -75,11 +75,11 @@ func CheckIsChinesePhone(phone string) bool {
 	return strings.HasPrefix(phone, "86")
 }
 
-func HandleRequest(params *map[string]string, apiUrl string) {
+func HandleRequest(params map[string]string, apiUrl string) {
 	signature := SignatureSmsSendcloud(params)
-	(*params)["signature"] = signature
+	params["signature"] = signature
 	postValues := url.Values{}
-	for postKey, PostValue := range *params {
+	for postKey, PostValue := range params {
 		postValues.Set(postKey, PostValue)
 	}
 	paramsStr := postValues.Encode()

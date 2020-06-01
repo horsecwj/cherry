@@ -12,7 +12,7 @@ import (
 func ServiceList(context echo.Context) error {
 	mainDB := utils.MainDbBegin()
 	defer mainDB.DbRollback()
-	var services Service
+	var services []Service
 	mainDB.Where("inside = true").Find(&services)
 	response := utils.SuccessResponse
 	response.Body = services

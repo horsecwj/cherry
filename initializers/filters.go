@@ -67,24 +67,24 @@ func treatLanguage(context echo.Context) {
 	context.Set("language", language)
 }
 
-func validateGeetest(context echo.Context, params *map[string]string) bool {
+func validateGeetest(context echo.Context, params map[string]string) bool {
 	if !validateGeetestUserId(context, params) {
 		return false
 	}
-	if (*params)[GtGoSdk.FN_CHALLENGE] == "" || (*params)[GtGoSdk.FN_VALIDATE] == "" || (*params)[GtGoSdk.FN_SECCODE] == "" || (*params)[GtGoSdk.GT_STATUS_SESSION_KEY] == "" || (*params)["user_id"] == "" {
+	if params[GtGoSdk.FN_CHALLENGE] == "" || params[GtGoSdk.FN_VALIDATE] == "" || params[GtGoSdk.FN_SECCODE] == "" || params[GtGoSdk.GT_STATUS_SESSION_KEY] == "" || params["user_id"] == "" {
 		return false
 	}
 	var result bool
 	gt := GtGoSdk.GeetestLib(GeetestConfig.PrivateKey, GeetestConfig.CaptchaID)
-	challenge := (*params)[GtGoSdk.FN_CHALLENGE]
-	validate := (*params)[GtGoSdk.FN_VALIDATE]
-	seccode := (*params)[GtGoSdk.FN_SECCODE]
-	status, err := strconv.Atoi((*params)[GtGoSdk.GT_STATUS_SESSION_KEY])
+	challenge := params[GtGoSdk.FN_CHALLENGE]
+	validate := params[GtGoSdk.FN_VALIDATE]
+	seccode := params[GtGoSdk.FN_SECCODE]
+	status, err := strconv.Atoi(params[GtGoSdk.GT_STATUS_SESSION_KEY])
 
 	if err != nil {
 		return false
 	}
-	userId := (*params)["user_id"]
+	userId := params["user_id"]
 	if status == 0 {
 		result = gt.FailbackValidate(challenge, validate, seccode)
 	} else {
@@ -93,7 +93,7 @@ func validateGeetest(context echo.Context, params *map[string]string) bool {
 	return result
 }
 
-func trustGeetest(context echo.Context, params *map[string]string) bool {
+func trustGeetest(context echo.Context, params map[string]string) bool {
 	dataRedis := utils.GetRedisConn("data")
 	defer dataRedis.Close()
 	key := "limit-traffic-with-ip-" + context.RealIP()
@@ -107,20 +107,20 @@ func trustGeetest(context echo.Context, params *map[string]string) bool {
 		}
 	}
 
-	if (*params)[GtGoSdk.FN_CHALLENGE] == "" || (*params)[GtGoSdk.FN_VALIDATE] == "" || (*params)[GtGoSdk.FN_SECCODE] == "" || (*params)[GtGoSdk.GT_STATUS_SESSION_KEY] == "" || (*params)["user_id"] == "" {
+	if params[GtGoSdk.FN_CHALLENGE] == "" || params[GtGoSdk.FN_VALIDATE] == "" || params[GtGoSdk.FN_SECCODE] == "" || params[GtGoSdk.GT_STATUS_SESSION_KEY] == "" || params["user_id"] == "" {
 		return false
 	}
 	var result bool
 	gt := GtGoSdk.GeetestLib(GeetestConfig.PrivateKey, GeetestConfig.CaptchaID)
-	challenge := (*params)[GtGoSdk.FN_CHALLENGE]
-	validate := (*params)[GtGoSdk.FN_VALIDATE]
-	seccode := (*params)[GtGoSdk.FN_SECCODE]
-	status, err := strconv.Atoi((*params)[GtGoSdk.GT_STATUS_SESSION_KEY])
+	challenge := params[GtGoSdk.FN_CHALLENGE]
+	validate := params[GtGoSdk.FN_VALIDATE]
+	seccode := params[GtGoSdk.FN_SECCODE]
+	status, err := strconv.Atoi(params[GtGoSdk.GT_STATUS_SESSION_KEY])
 
 	if err != nil {
 		return false
 	}
-	userId := (*params)["user_id"]
+	userId := params["user_id"]
 	if status == 0 {
 		result = gt.FailbackValidate(challenge, validate, seccode)
 	} else {
@@ -129,8 +129,8 @@ func trustGeetest(context echo.Context, params *map[string]string) bool {
 	return result
 }
 
-func checkTimestamp(context echo.Context, params *map[string]string) bool {
-	timestamp, _ := strconv.Atoi((*params)["timestamp"])
+func checkTimestamp(context echo.Context, params map[string]string) bool {
+	timestamp, _ := strconv.Atoi(params["timestamp"])
 	now := time.Now()
 	if int(now.Add(-time.Second*60*5).Unix()) <= timestamp && timestamp <= int(now.Add(time.Second*60*5).Unix()) {
 		return true
@@ -138,8 +138,8 @@ func checkTimestamp(context echo.Context, params *map[string]string) bool {
 	return false
 }
 
-func validateGeetestUserId(context echo.Context, params *map[string]string) bool {
-	decodeBytes, err := base64.StdEncoding.DecodeString((*params)["user_id"])
+func validateGeetestUserId(context echo.Context, params map[string]string) bool {
+	decodeBytes, err := base64.StdEncoding.DecodeString(params["user_id"])
 	if err != nil {
 		return false
 	}
@@ -169,4 +169,15 @@ func verifyEmailOrPhoneBeforeRegist(context echo.Context) error {
 		return utils.BuildError("5002")
 	}
 	return nil
+}
+
+func checkSign(context echo.Context, params map[string]string) (allow bool) {
+	mainDB := utils.MainDbBegin()
+	defer mainDB.DbRollback()
+	var service Service
+	if mainDB.Where("inside = true").Where("app_key = ?", params["app_key"]).First(&service).RecordNotFound() {
+		return
+	}
+	allow, _ = PublicKeySignVerified(context.Request().Method, context.Path(), service.CustomKey, params)
+	return
 }

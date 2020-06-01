@@ -76,7 +76,7 @@ func (account *Account) UnlockFunds(db *utils.GormDB, amount decimal.Decimal, re
 		"modifiable_id":   strconv.Itoa(modifiableId),
 		"modifiable_type": modifiableType,
 	}
-	err = account.after(db, FUNS["UnlockFunds"], amount, &opts)
+	err = account.after(db, FUNS["UnlockFunds"], amount, opts)
 	return
 }
 
@@ -96,7 +96,7 @@ func (account *Account) LockFunds(db *utils.GormDB, amount decimal.Decimal, reas
 		"modifiable_id":   strconv.Itoa(modifiableId),
 		"modifiable_type": modifiableType,
 	}
-	err = account.after(db, FUNS["LockFunds"], amount, &opts)
+	err = account.after(db, FUNS["LockFunds"], amount, opts)
 	return
 }
 
@@ -116,7 +116,7 @@ func (account *Account) PlusFunds(db *utils.GormDB, amount, fee decimal.Decimal,
 		"modifiable_id":   strconv.Itoa(modifiableId),
 		"modifiable_type": modifiableType,
 	}
-	err = account.after(db, FUNS["PlusFunds"], amount, &opts)
+	err = account.after(db, FUNS["PlusFunds"], amount, opts)
 	return
 }
 
@@ -136,7 +136,7 @@ func (account *Account) SubFunds(db *utils.GormDB, amount, fee decimal.Decimal, 
 		"modifiable_id":   strconv.Itoa(modifiableId),
 		"modifiable_type": modifiableType,
 	}
-	err = account.after(db, FUNS["SubFunds"], amount, &opts)
+	err = account.after(db, FUNS["SubFunds"], amount, opts)
 	return
 }
 
@@ -165,7 +165,7 @@ func (account *Account) UnlockedAndSubFunds(db *utils.GormDB, amount, locked, fe
 		"modifiable_id":   strconv.Itoa(modifiableId),
 		"modifiable_type": modifiableType,
 	}
-	err = account.after(db, FUNS["UnlockedAndSubFunds"], amount, &opts)
+	err = account.after(db, FUNS["UnlockedAndSubFunds"], amount, opts)
 	return
 }
 
@@ -190,7 +190,7 @@ func (account *Account) PlusAndLockFunds(db *utils.GormDB, amount, locked, fee d
 		"modifiable_id":   strconv.Itoa(modifiableId),
 		"modifiable_type": modifiableType,
 	}
-	err = account.after(db, FUNS["PlusAndLockFunds"], amount, &opts)
+	err = account.after(db, FUNS["PlusAndLockFunds"], amount, opts)
 	return
 }
 
@@ -209,35 +209,35 @@ func (account *Account) changeBalanceAndLocked(db *utils.GormDB, deltaB, deltaL 
 }
 
 // global
-func (account *Account) after(db *utils.GormDB, fun int, amount decimal.Decimal, opts *map[string]string) (err error) {
+func (account *Account) after(db *utils.GormDB, fun int, amount decimal.Decimal, opts map[string]string) (err error) {
 	var fee decimal.Decimal
-	if (*opts)["fee"] != "" {
-		fee, _ = decimal.NewFromString((*opts)["fee"])
+	if opts["fee"] != "" {
+		fee, _ = decimal.NewFromString(opts["fee"])
 	}
-	if (*opts)["reason"] == "" {
-		(*opts)["reason"] = strconv.Itoa(UNKNOWN)
+	if opts["reason"] == "" {
+		opts["reason"] = strconv.Itoa(UNKNOWN)
 	}
 	attributes := map[string]string{
 		"fun":             strconv.Itoa(fun),
 		"fee":             fee.String(),
-		"reason":          (*opts)["reason"],
+		"reason":          opts["reason"],
 		"amount":          account.Amount().String(),
 		"currency_id":     strconv.Itoa(account.CurrencyId),
 		"user_id":         strconv.Itoa(account.UserId),
 		"account_id":      strconv.Itoa(account.Id),
-		"modifiable_id":   (*opts)["modifiable_id"],
-		"modifiable_type": (*opts)["modifiable_type"],
+		"modifiable_id":   opts["modifiable_id"],
+		"modifiable_type": opts["modifiable_type"],
 	}
 	attributes["locked"], attributes["balance"], err = account.computeLockedAndBalance(fun, amount, opts)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	err = account.optimisticallyLockAccountAndCreate(db, account.Balance, account.Locked, &attributes)
+	err = account.optimisticallyLockAccountAndCreate(db, account.Balance, account.Locked, attributes)
 	return
 }
 
-func (account *Account) computeLockedAndBalance(fun int, amount decimal.Decimal, opts *map[string]string) (locked, balance string, err error) {
+func (account *Account) computeLockedAndBalance(fun int, amount decimal.Decimal, opts map[string]string) (locked, balance string, err error) {
 	switch fun {
 	case 1:
 		locked = amount.Neg().String()
@@ -252,11 +252,11 @@ func (account *Account) computeLockedAndBalance(fun int, amount decimal.Decimal,
 		locked = "0"
 		balance = amount.Neg().String()
 	case 5:
-		l, _ := decimal.NewFromString((*opts)["locked"])
+		l, _ := decimal.NewFromString(opts["locked"])
 		locked = l.Neg().String()
 		balance = l.Sub(amount).String()
 	case 6:
-		l, _ := decimal.NewFromString((*opts)["locked"])
+		l, _ := decimal.NewFromString(opts["locked"])
 		locked = l.String()
 		balance = amount.Sub(l).String()
 	default:
@@ -265,31 +265,31 @@ func (account *Account) computeLockedAndBalance(fun int, amount decimal.Decimal,
 	return
 }
 
-func (account *Account) optimisticallyLockAccountAndCreate(db *utils.GormDB, balance, locked decimal.Decimal, attrs *map[string]string) (err error) {
-	if (*attrs)["account_id"] == "" {
+func (account *Account) optimisticallyLockAccountAndCreate(db *utils.GormDB, balance, locked decimal.Decimal, attrs map[string]string) (err error) {
+	if attrs["account_id"] == "" {
 		err = fmt.Errorf("account must be specified")
 	}
-	(*attrs)["created_at"] = time.Now().Format("2006-01-02 15:04:05")
-	(*attrs)["updated_at"] = (*attrs)["created_at"]
+	attrs["created_at"] = time.Now().Format("2006-01-02 15:04:05")
+	attrs["updated_at"] = attrs["created_at"]
 
 	sql := `INSERT INTO account_versions
   (user_id, account_id, reason, balance, locked, amount, modifiable_id, modifiable_type, currency_id, fun, created_at, updated_at)
   SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?  FROM accounts WHERE accounts.balance = ? AND accounts.locked = ? AND accounts.id = ?`
 	result := db.Exec(sql,
-		(*attrs)["user_id"],
-		(*attrs)["account_id"],
-		(*attrs)["reason"],
-		(*attrs)["balance"],
-		(*attrs)["locked"],
-		(*attrs)["amount"],
-		(*attrs)["modifiable_id"],
-		(*attrs)["modifiable_type"],
-		(*attrs)["currency_id"], (*attrs)["fun"],
-		(*attrs)["created_at"],
-		(*attrs)["updated_at"],
+		attrs["user_id"],
+		attrs["account_id"],
+		attrs["reason"],
+		attrs["balance"],
+		attrs["locked"],
+		attrs["amount"],
+		attrs["modifiable_id"],
+		attrs["modifiable_type"],
+		attrs["currency_id"], attrs["fun"],
+		attrs["created_at"],
+		attrs["updated_at"],
 		balance,
 		locked,
-		(*attrs)["account_id"],
+		attrs["account_id"],
 	)
 	if result.RowsAffected != 1 {
 		err = fmt.Errorf("Insert row failed.")

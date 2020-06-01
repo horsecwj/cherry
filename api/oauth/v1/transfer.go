@@ -78,7 +78,7 @@ func PostTransfersCreate(context echo.Context) error {
 	err := transferToChangeAccount(&transfer, 9)
 	if err == nil {
 		transfer.InitializeTimestamp()
-		sendMessageToNotifyUrl(params["notify_url"], &map[string]string{
+		sendMessageToNotifyUrl(params["notify_url"], map[string]string{
 			"id":         strconv.Itoa(transfer.Id),
 			"from":       strconv.Itoa(transfer.From),
 			"to":         strconv.Itoa(transfer.To),
@@ -131,7 +131,7 @@ func PostTransfersBack(context echo.Context) error {
 	err := transferToChangeAccount(&transfer, 3)
 	if err == nil {
 		transfer.InitializeTimestamp()
-		sendMessageToNotifyUrl(params["notify_url"], &map[string]string{
+		sendMessageToNotifyUrl(params["notify_url"], map[string]string{
 			"id":         strconv.Itoa(transfer.Id),
 			"from":       strconv.Itoa(transfer.From),
 			"to":         strconv.Itoa(transfer.To),
@@ -191,7 +191,7 @@ func transferToChangeAccount(transfer *Transfer, times int) error {
 	return utils.BuildError("1104")
 }
 
-func sendMessageToNotifyUrl(notify_url string, message *map[string]string) {
+func sendMessageToNotifyUrl(notify_url string, message map[string]string) {
 	if transferNotifyRoutingKey == "" {
 		for _, worker := range sneakerWorkers.AllWorkers {
 			if worker.Name == "TransferNotifyWorker" {
@@ -200,7 +200,7 @@ func sendMessageToNotifyUrl(notify_url string, message *map[string]string) {
 		}
 	}
 	params := map[string]string{"notify_url": notify_url}
-	for k, v := range *message {
+	for k, v := range message {
 		params[k] = v
 	}
 	b, err := json.Marshal(params)

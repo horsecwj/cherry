@@ -12,14 +12,12 @@ import (
 	"net/url"
 	"sort"
 	"strings"
-
-	. "cherry/models"
 )
 
-func PublicKeySignVerified(method, path string, service *Service, params *map[string]string) (bool, error) {
+func PublicKeySignVerified(method, path, customKey string, params map[string]string) (bool, error) {
 	plaintext := method + "|" + path + "|"
 	var keys []string
-	for k, _ := range *params {
+	for k, _ := range params {
 		if k == "signature" {
 			continue
 		}
@@ -30,9 +28,9 @@ func PublicKeySignVerified(method, path string, service *Service, params *map[st
 		if i > 0 {
 			plaintext += "&"
 		}
-		plaintext += key + "=" + strings.ToLower(url.QueryEscape((*params)[key]))
+		plaintext += key + "=" + strings.ToLower(url.QueryEscape(params[key]))
 	}
-	block, _ := pem.Decode([]byte(service.CustomKey))
+	block, _ := pem.Decode([]byte(customKey))
 	if block == nil {
 		return false, errors.New("public key error")
 	}
@@ -45,7 +43,7 @@ func PublicKeySignVerified(method, path string, service *Service, params *map[st
 	h.Write([]byte(plaintext))
 	hashed := h.Sum(nil)
 	opts := &rsa.PSSOptions{SaltLength: rsa.PSSSaltLengthAuto, Hash: crypto.SHA256}
-	decoded, err := base64.StdEncoding.DecodeString((*params)["signature"])
+	decoded, err := base64.StdEncoding.DecodeString(params["signature"])
 	if err != nil {
 		return false, errors.New("base64 decode error")
 	}
@@ -56,10 +54,10 @@ func PublicKeySignVerified(method, path string, service *Service, params *map[st
 	}
 }
 
-func PrivateKeySign(method, path string, service *Service, params *map[string]string) (string, error) {
+func PrivateKeySign(method, path, privateKey string, params map[string]string) (string, error) {
 	plaintext := method + "|" + path + "|"
 	var keys []string
-	for k, _ := range *params {
+	for k, _ := range params {
 		if k == "signature" {
 			continue
 		}
@@ -70,9 +68,9 @@ func PrivateKeySign(method, path string, service *Service, params *map[string]st
 		if i > 0 {
 			plaintext += "&"
 		}
-		plaintext += key + "=" + strings.ToLower(url.QueryEscape((*params)[key]))
+		plaintext += key + "=" + strings.ToLower(url.QueryEscape(params[key]))
 	}
-	block, _ := pem.Decode([]byte(service.PrivateKey))
+	block, _ := pem.Decode([]byte(privateKey))
 	if block == nil {
 		return "", errors.New("private key error")
 	}

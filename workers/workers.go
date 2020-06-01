@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 	"os/signal"
 
@@ -39,6 +40,7 @@ func StartAllWorkers() {
 			for i := 0; i < w.GetThreads(); i++ {
 				go func(w sneakerWorkers.Worker) {
 					sneaker.SubscribeMessageByQueue(initializers.RabbitMqConnect.Connection, w, amqp.Table{})
+					log.Println("stated ", w.GetName())
 				}(w)
 			}
 		}

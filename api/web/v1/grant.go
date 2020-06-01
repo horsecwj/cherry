@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/labstack/echo"
 	"github.com/shopspring/decimal"
@@ -55,7 +54,7 @@ func PostGrantCreate(context echo.Context) error {
 	if err != nil {
 		return err
 	}
-	sendMessageToGrantNotifyUrl(&map[string]string{
+	sendMessageToGrantNotifyUrl(map[string]string{
 		"id":         strconv.Itoa(transfer.Id),
 		"from":       strconv.Itoa(transfer.From),
 		"to":         strconv.Itoa(transfer.To),
@@ -63,7 +62,6 @@ func PostGrantCreate(context echo.Context) error {
 		"currency":   currency.Key,
 		"service_id": strconv.Itoa(service.Id),
 		"notify_url": service.GrantUrl,
-		"timestamp":  strconv.Itoa(int(time.Now().Unix())),
 	})
 
 	response := utils.SuccessResponse
@@ -189,7 +187,7 @@ func grantToTargetAccount(transfer *Transfer, times int) error {
 
 var grantRoutingKey, grantCancelQueue string
 
-func sendMessageToGrantNotifyUrl(message *map[string]string) {
+func sendMessageToGrantNotifyUrl(message map[string]string) {
 	if grantRoutingKey == "" {
 		for _, worker := range sneakerWorkers.AllWorkers {
 			if worker.Name == "GrantNotifyWorker" {
@@ -204,7 +202,7 @@ func sendMessageToGrantNotifyUrl(message *map[string]string) {
 			}
 		}
 	}
-	b, err := json.Marshal(*message)
+	b, err := json.Marshal(message)
 	if err != nil {
 		log.Println(err)
 	}

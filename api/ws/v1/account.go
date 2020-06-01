@@ -13,6 +13,10 @@ import (
 	"cherry/utils"
 )
 
+const (
+	pongWait = time.Minute * 10
+)
+
 func Accounts(echoContext echo.Context) (err error) {
 	upgrader := websocket.Upgrader{}
 	user := echoContext.Get("current_user").(User)
@@ -21,7 +25,8 @@ func Accounts(echoContext echo.Context) (err error) {
 		log.Println("upgrade:", err)
 		return
 	}
-	c.SetWriteDeadline(time.Now().Add(time.Minute * 10))
+	c.SetWriteDeadline(time.Now().Add(pongWait))
+	c.SetPongHandler(func(string) error { c.SetReadDeadline(time.Now().Add(pongWait)); return nil })
 	defer c.Close()
 	var params struct {
 		CurrencyIds []int `json:"currency_ids"`

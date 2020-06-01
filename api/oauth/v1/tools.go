@@ -44,7 +44,7 @@ func PostEmail(context echo.Context) error {
 	if db.Where("source = ?", "Email").Where("user_id = ?", params["uid"]).First(&identity).RecordNotFound() {
 		return utils.BuildError("1021")
 	}
-	pushMessageToEmail(&map[string]string{
+	pushMessageToEmail(map[string]string{
 		"email":   identity.Symbol,
 		"title":   params["subject"],
 		"content": params["content"],
@@ -61,7 +61,7 @@ func PostSms(context echo.Context) error {
 	if db.Where("source = ?", "Phone").Where("user_id = ?", params["uid"]).First(&identity).RecordNotFound() {
 		return utils.BuildError("1021")
 	}
-	pushMessageToSms(&map[string]string{
+	pushMessageToSms(map[string]string{
 		"phone":   identity.Symbol,
 		"type":    "enterprise",
 		"content": params["content"],
@@ -72,7 +72,7 @@ func PostSms(context echo.Context) error {
 
 var emailRoutingKey, smsRoutingKey string
 
-func pushMessageToEmail(payload *map[string]string) {
+func pushMessageToEmail(payload map[string]string) {
 	if emailRoutingKey == "" {
 		for _, worker := range sneakerWorkers.AllWorkers {
 			if worker.Name == "EmailWorker" {
@@ -80,7 +80,7 @@ func pushMessageToEmail(payload *map[string]string) {
 			}
 		}
 	}
-	b, err := json.Marshal(*payload)
+	b, err := json.Marshal(payload)
 	if err != nil {
 		log.Println(err)
 		panic(err)
@@ -99,7 +99,7 @@ func pushMessageToEmail(payload *map[string]string) {
 	}
 }
 
-func pushMessageToSms(payload *map[string]string) {
+func pushMessageToSms(payload map[string]string) {
 	if smsRoutingKey == "" {
 		for _, worker := range sneakerWorkers.AllWorkers {
 			if worker.Name == "SmsWorker" {
@@ -107,7 +107,7 @@ func pushMessageToSms(payload *map[string]string) {
 			}
 		}
 	}
-	b, err := json.Marshal(*payload)
+	b, err := json.Marshal(payload)
 	if err != nil {
 		fmt.Println("{ error:", err, "}")
 		panic(err)
