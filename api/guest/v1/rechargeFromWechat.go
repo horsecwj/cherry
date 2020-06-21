@@ -68,20 +68,20 @@ func RechargeFromWechatVerify(context echo.Context) (err error) {
 			response.SetString("return_msg", "未找到此数据。")
 			return context.XML(http.StatusForbidden, wxpay.MapToXml(response))
 		}
-		recharge.OutTradeNo = params.GetString("out_trade_no")
 		totalFee, _ := decimal.NewFromString(params["total_fee"])
 		if !totalFee.Equal(recharge.Amount) {
 			response.SetString("return_code", "FAIL")
 			response.SetString("return_msg", "金额不一致。")
 			return context.XML(http.StatusForbidden, wxpay.MapToXml(response))
 		}
-		recharge.State = Done
 		var currency Currency
 		if mainDB.Where("symbol = ?", strings.ToLower(params.GetString("fee_type"))).First(&currency).RecordNotFound() {
 			response.SetString("return_code", "FAIL")
 			response.SetString("return_msg", "不支持此币种。")
 			return context.XML(http.StatusForbidden, wxpay.MapToXml(response))
 		}
+		recharge.OutTradeNo = params.GetString("out_trade_no")
+		recharge.State = Done
 		var account Account
 		mainDB.FirstOrCreate(&account, map[string]interface{}{"user_id": recharge.UserId, "currency_id": currency.Id})
 		err = account.PlusFunds(mainDB, recharge.Amount, decimal.Zero, RECHARGE, recharge.Id, "Recharge")
