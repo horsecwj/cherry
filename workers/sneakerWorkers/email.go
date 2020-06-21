@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"time"
 
-	. "cherry/mailer"
+	. "cherry/services/mailer"
 	"cherry/utils"
 )
 
@@ -33,10 +33,10 @@ func excute(start int64, payload *Payload, worker *Worker, exception *Exception)
 		}
 	}(exception)
 	reflect.ValueOf(payload).MethodByName(payload.I18nFuncName()).Call([]reflect.Value{})
-	t, err := template.New("content.html").Funcs(payload.FuncMap).ParseFiles(
-		"public/workers/emailWorker/content.html",
-		"public/workers/emailWorker/head.html",
-		"public/workers/emailWorker/footer.html",
+	t, err := template.New("emailWorker.html").Funcs(payload.FuncMap).ParseFiles(
+		"services/mailer/templates/emailWorker.html",
+		"services/mailer/templates/emailWorkerFooter.html",
+		"services/mailer/templates/emailWorkerHead.html",
 	)
 	if err != nil {
 		worker.LogError("parse file err:", err)
