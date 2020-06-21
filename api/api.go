@@ -44,7 +44,7 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(initializers.Auth)
-	routes.SetWebInterfaces(e)
+	routes.SetGuestInterfaces(e)
 
 	e.HTTPErrorHandler = customHTTPErrorHandler
 	e.HideBanner = true

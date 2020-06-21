@@ -1,33 +1,25 @@
 ---
-# Web --------------------------------------------------------------------------------------
+# Guest --------------------------------------------------------------------------------------
 ## currency
-- path: /api/web/currencies
+- path: /api/guest/currencies
   method: GET
-
-## grant
-- path: /api/web/grant/create
-  method: POST
-- path: /api/web/grant/confirm
-  method: GET
-- path: /api/web/grant/confirm
-  method: POST
 
 ## user
-- path: /api/web/user/accounts
+- path: /api/guest/user/accounts
   method: GET
   auth: true
 
 ## Wechat user
-- path: /api/web/user/wechat/login
+- path: /api/guest/user/wechat/login
   method: GET
-- path: /api/web/user/wechat/callback
+- path: /api/guest/user/wechat/callback
   method: GET
 
 ## recharge wechat
-- path: /api/web/recharge/wechat
+- path: /api/guest/recharge/wechat
   method: POST
   auth: true
-- path: /api/web/v1/recharge/wechat/verify
+- path: /api/guest/v1/recharge/wechat/verify
   method: GET
-- path: /api/web/v1/recharge/wechat/verify
+- path: /api/guest/v1/recharge/wechat/verify
   method: POST
