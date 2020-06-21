@@ -11,7 +11,7 @@ import (
 
 	envConfig "cherry/config"
 	"cherry/initializers"
-	. "cherry/models"
+	. "cherry/orm/db/models"
 	"cherry/utils"
 )
 

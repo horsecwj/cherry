@@ -10,7 +10,7 @@ import (
 	"github.com/labstack/echo"
 
 	envConfig "cherry/config"
-	. "cherry/models"
+	. "cherry/orm/db/models"
 	"cherry/utils"
 )
 

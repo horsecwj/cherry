@@ -5,7 +5,7 @@ import (
 
 	"github.com/labstack/echo"
 
-	. "cherry/models"
+	. "cherry/orm/db/models"
 	"cherry/utils"
 )
 

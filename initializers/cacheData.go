@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"strings"
 
-	. "cherry/models"
+	. "cherry/orm/db/models"
 	"cherry/utils"
 )
 

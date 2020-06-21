@@ -1,5 +1,6 @@
 cmd/*
 config/*.yml
+config/interfaces/*.yml
 config/pems/*.pem
 config/pems/*.p12
 logs/*.log

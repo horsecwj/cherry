@@ -10,7 +10,7 @@ import (
 	"github.com/labstack/echo"
 	"gopkg.in/yaml.v2"
 
-	. "cherry/models"
+	. "cherry/orm/db/models"
 	"cherry/utils"
 )
 
@@ -88,9 +88,6 @@ func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 		if currentApiInterface.CheckTimestamp && checkTimestamp(context, params) == false {
 			return utils.BuildError("1024")
-		}
-		if currentApiInterface.Sign && !checkSign(context, params) {
-			return utils.BuildError("1023")
 		}
 		db := utils.MainDbBegin()
 		defer db.DbRollback()

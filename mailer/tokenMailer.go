@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"cherry/config"
-	. "cherry/models"
+	. "cherry/orm/db/models"
 )
 
 func (mp *Payload) I18nFuncName() string {

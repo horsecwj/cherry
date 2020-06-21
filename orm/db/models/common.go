@@ -59,7 +59,7 @@ func AutoMigrations() {
 
 	// account
 	mainDB.AutoMigrate(&Account{})
-	mainDB.Model(&Account{}).AddUniqueIndex("index_accounts_on_idx0", "user_id", "currency_id", "modifiable_type", "modifiable_id")
+	mainDB.Model(&Account{}).AddUniqueIndex("index_accounts_on_idx0", "user_id", "currency_id")
 
 	// account_version
 	mainDB.AutoMigrate(&AccountVersion{})
@@ -93,16 +93,8 @@ func AutoMigrations() {
 	// role
 	mainDB.AutoMigrate(&Role{})
 
-	// service
-	mainDB.AutoMigrate(&Service{})
-
 	// token
 	mainDB.AutoMigrate(&Token{})
-
-	// transfer
-	mainDB.AutoMigrate(&Transfer{})
-	mainDB.Model(&Transfer{}).AddUniqueIndex("index_transfers_on_sn_and_service_id", "sn", "service_id")
-	mainDB.AutoMigrate(&TransferNotifyLog{})
 
 	mainDB.AutoMigrate(&TwoFactor{})
 

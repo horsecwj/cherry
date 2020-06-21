@@ -5,7 +5,7 @@ import (
 	"html/template"
 
 	"cherry/config"
-	. "cherry/models"
+	. "cherry/orm/db/models"
 )
 
 type Payload struct {

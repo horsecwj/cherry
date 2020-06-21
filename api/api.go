@@ -17,7 +17,7 @@ import (
 
 	envConfig "cherry/config"
 	"cherry/initializers"
-	"cherry/models"
+	"cherry/orm/db/models"
 	"cherry/routes"
 	"cherry/utils"
 	"cherry/workers/sneakerWorkers"
@@ -37,7 +37,7 @@ func main() {
 	e := echo.New()
 	e.File("/web", "public/assets/index.html")
 	e.File("/web/*", "public/assets/index.html")
-	e.Static("/assets", "public/assets")
+	e.Static("/public/assets", "public/assets")
 	if envConfig.CurrentEnv.Newrelic.AppName != "" && envConfig.CurrentEnv.Newrelic.LicenseKey != "" {
 		e.Use(newrelic.NewRelic(envConfig.CurrentEnv.Newrelic.AppName, envConfig.CurrentEnv.Newrelic.LicenseKey))
 	}
@@ -45,14 +45,8 @@ func main() {
 	e.Use(middleware.Recover())
 	e.Use(initializers.Auth)
 	routes.SetWebInterfaces(e)
-	routes.SetOauthInterfaces(e)
-	routes.SetWsInterfaces(e)
 
 	e.HTTPErrorHandler = customHTTPErrorHandler
-	t := &Template{
-		templates: template.Must(template.ParseGlob("public/api/*/*.html")),
-	}
-	e.Renderer = t
 	e.HideBanner = true
 	go func() {
 		if err := e.Start(":9700"); err != nil {

@@ -11,7 +11,7 @@ import (
 	"github.com/labstack/echo"
 
 	"cherry/initializers/locale"
-	. "cherry/models"
+	. "cherry/orm/db/models"
 	"cherry/utils"
 )
 
@@ -169,15 +169,4 @@ func verifyEmailOrPhoneBeforeRegist(context echo.Context) error {
 		return utils.BuildError("5002")
 	}
 	return nil
-}
-
-func checkSign(context echo.Context, params map[string]string) (allow bool) {
-	mainDB := utils.MainDbBegin()
-	defer mainDB.DbRollback()
-	var service Service
-	if mainDB.Where("inside = true").Where("app_key = ?", params["app_key"]).First(&service).RecordNotFound() {
-		return
-	}
-	allow, _ = PublicKeySignVerified(context.Request().Method, context.Path(), service.CustomKey, params)
-	return
 }
